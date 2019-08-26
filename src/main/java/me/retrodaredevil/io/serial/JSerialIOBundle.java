@@ -7,11 +7,13 @@ import me.retrodaredevil.io.IOBundle;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class JSerialIOBundle implements IOBundle {
+public class JSerialIOBundle implements IOBundle, AutoCloseable {
 	private final InputStream inputStream;
 	private final OutputStream outputStream;
+	private final SerialPort serialPort;
 	
 	public JSerialIOBundle(SerialPort serialPort, SerialConfig serialConfig){
+		this.serialPort = serialPort;
 		serialPort.openPort(1000);
 //		serialPort.setComPortParameters(19200, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
 //		serialPort.setDTR();
@@ -68,6 +70,11 @@ public class JSerialIOBundle implements IOBundle {
 			throw new SerialPortException("invalid port! port: " + port, e);
 		}
 		return new JSerialIOBundle(serialPort, serialConfig);
+	}
+	
+	@Override
+	public void close() {
+		serialPort.closePort();
 	}
 	
 	@Override

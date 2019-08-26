@@ -8,7 +8,7 @@ public interface ModbusMessage {
 	byte getByteFunctionCode();
 	
 	/**
-	 * @return An array where each element represents a single byte (8 bit number). The length of this will always be a multiple of two.
+	 * @return An array where each element represents a single byte (8 bit number).
 	 */
 	int[] getData();
 	byte[] getByteData();

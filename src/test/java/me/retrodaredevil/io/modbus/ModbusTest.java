@@ -1,9 +1,11 @@
 package me.retrodaredevil.io.modbus;
 
+import me.retrodaredevil.io.modbus.handling.SingleWriteHandler;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -33,7 +35,16 @@ final class ModbusTest {
 	}
 	@Test
 	void testRTUEncoding(){
-		testDataEncoder(new RTUDataEncoder());
+		RTUDataEncoder encoder = new RTUDataEncoder();
+		testDataEncoder(encoder);
+		
+		ByteArrayInputStream responseStream = new ByteArrayInputStream(new byte[] {
+				1, 6, 1, 0, 0, 1, 0x49, (byte) 0xF6
+		});
+		OutputStream output = new ByteArrayOutputStream();
+		ModbusSlave slave = new IOModbusSlave(responseStream, output, encoder);
+		
+		slave.sendMessage(1, new SingleWriteHandler(0x010A, 1));
 	}
 	private void testDataEncoder(IODataEncoder encoder){
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -43,4 +54,5 @@ final class ModbusTest {
 		ModbusMessage receivedMessage = encoder.readMessage(1, input);
 		assertEquals(message, receivedMessage);
 	}
+	
 }

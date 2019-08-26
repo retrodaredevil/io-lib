@@ -23,6 +23,39 @@ public final class ModbusMessages {
 		return new DefaultModbusMessage((byte) functionCode, data, byteData);
 	}
 	
+	/**
+	 * NOTE: Do not call this for the CRC!
+	 * @param data16Bit An array of ints where each element represents a 16 bit number.
+	 * @return An array twice the size of {@code data16Bit}
+	 */
+	public static int[] get8BitDataFrom16BitArray(int... data16Bit){
+		int[] r = new int[data16Bit.length * 2];
+		for(int i = 0; i < r.length; i++){
+			int data = data16Bit[i / 2];
+			// NOTE: Except for the CRC, it goes High byte, then Low byte.
+			if(i % 2 == 0){ // high byte
+				r[i] = (data & 0xFF00) >> 8;
+			} else { // low byte
+				r[i] = data & 0xFF;
+			}
+		}
+		return r;
+	}
+	public static int[] get16BitDataFrom8BitArray(int ...data8Bit){
+		int originalLength = data8Bit.length;
+		if(originalLength % 2 == 1){
+			throw new IllegalArgumentException("The length must be a multiple of two! length: " + originalLength);
+		}
+		int length = originalLength / 2;
+		int[] r = new int[length];
+		for(int i = 0; i < length; i++){
+			int high = data8Bit[i * 2];
+			int low = data8Bit[i * 2 + 1];
+			r[i] = (high << 8) | low;
+		}
+		return r;
+	}
+	
 	private static class DefaultModbusMessage implements ModbusMessage {
 		
 		private final byte functionCode;
@@ -36,9 +69,6 @@ public final class ModbusMessages {
 			
 			if(data.length != byteData.length){
 				throw new IllegalArgumentException();
-			}
-			if(data.length % 2 != 0){
-				throw new IllegalArgumentException("length of the data must be a multiple of 2!");
 			}
 		}
 		
