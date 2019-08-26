@@ -10,7 +10,7 @@ public final class RedundancyUtil {
 		}
 		return 0xFF & (-((byte) (sum & 0xFF)));
 	}
-	public static int calculateCRC(int[] bytes){
+	public static int calculateCRC(int... bytes){
 		int crc = 0xFFFF;
 		for(int b : bytes){
 			crc ^= b & 0xFF;
@@ -25,7 +25,7 @@ public final class RedundancyUtil {
 		}
 		return crc;
 	}
-	public static int calculateCRC(byte[] bytes){
+	public static int calculateCRC(byte... bytes){
 		int crc = 0xFFFF;
 		for(int b : bytes){
 			crc ^= b & 0xFF;

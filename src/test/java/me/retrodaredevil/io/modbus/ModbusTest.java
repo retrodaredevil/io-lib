@@ -1,13 +1,17 @@
 package me.retrodaredevil.io.modbus;
 
+import me.retrodaredevil.io.modbus.handling.MultipleWriteHandler;
+import me.retrodaredevil.io.modbus.handling.ReadRegistersHandler;
 import me.retrodaredevil.io.modbus.handling.SingleWriteHandler;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static me.retrodaredevil.io.modbus.ModbusMessages.get16BitDataFrom8BitArray;
+import static org.junit.jupiter.api.Assertions.*;
 
 final class ModbusTest {
 	@Test
@@ -37,15 +41,55 @@ final class ModbusTest {
 	void testRTUEncoding(){
 		RTUDataEncoder encoder = new RTUDataEncoder();
 		testDataEncoder(encoder);
-		
-		ByteArrayInputStream responseStream = new ByteArrayInputStream(new byte[] {
-				1, 6, 1, 0, 0, 1, 0x49, (byte) 0xF6
-		});
-		OutputStream output = new ByteArrayOutputStream();
-		ModbusSlave slave = new IOModbusSlave(responseStream, output, encoder);
-		
-		slave.sendMessage(1, new SingleWriteHandler(0x010A, 1));
+		{ // test writing values
+			ByteArrayInputStream responseStream = new ByteArrayInputStream(new byte[]{
+					1,
+					6,
+					1, 0, // NOTE: This has an incorrect register, which is why we don't check the register
+					0, 1,
+					0x49, (byte) 0xF6
+			});
+			OutputStream output = new ByteArrayOutputStream();
+			ModbusSlave slave = new IOModbusSlave(responseStream, output, encoder);
+			
+			slave.sendMessage(1, new SingleWriteHandler(0x010A, 1, false));
+		}
+		{ // test writing multiple values
+			int crc = RedundancyUtil.calculateCRC(1, 16, 0x01, 0x0A, 0, 2);
+			System.out.println(crc);
+			ByteArrayInputStream responseStream = new ByteArrayInputStream(new byte[]{
+					1,
+					16, // function code
+					0x01, 0x0A, // starting address
+					0, 2, // 2 registers
+//					4, // 4 bytes total
+					(byte) (crc & 0xFF), (byte) ((crc & 0xFF00) >> 8)
+			});
+			OutputStream output = new ByteArrayOutputStream();
+			ModbusSlave slave = new IOModbusSlave(responseStream, output, encoder);
+			
+			slave.sendMessage(1, new MultipleWriteHandler(0x010A, new int[] {
+					31, 71, 98, 43
+			}, true));
+		}
+		{ // test reading values
+			int crc = RedundancyUtil.calculateCRC(1, 3, 3 * 2, 99, 67, 85, 45, 92, 91);
+			System.out.println(crc);
+			ByteArrayInputStream responseStream = new ByteArrayInputStream(new byte[]{
+					1,
+					3, // function code
+					3 * 2, // 3 registers * 2 bytes each = 6 bytes
+					99, 67, 85, 45, 92, 91,
+					(byte) (crc & 0xFF), (byte) ((crc & 0xFF00) >> 8)
+			});
+			OutputStream output = new ByteArrayOutputStream();
+			ModbusSlave slave = new IOModbusSlave(responseStream, output, encoder);
+			
+			int[] registers = slave.sendMessage(1, new ReadRegistersHandler(0x010A, 3)); // this will have a length of 3
+			assertArrayEquals(get16BitDataFrom8BitArray(99, 67, 85, 45, 92, 91), registers);
+		}
 	}
+	/** A method to test encoding and decoding messages */
 	private void testDataEncoder(IODataEncoder encoder){
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		ModbusMessage message = ModbusMessages.createMessage((byte) 3, new byte[] {0, 0xA, 0, 1});
