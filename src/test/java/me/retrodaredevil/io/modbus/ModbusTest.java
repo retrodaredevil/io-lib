@@ -15,6 +15,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 final class ModbusTest {
 	@Test
+	void testModbusMessages(){
+		assertEquals(133, ModbusMessages.createMessage(133, new int[]{}).getFunctionCode());
+	}
+	@Test
 	void testLRC(){
 		int[] data = new int[] { 17, 3, 0, 107, 0, 3 };
 		assertEquals(0x7E, RedundancyUtil.calculateLRC(data));

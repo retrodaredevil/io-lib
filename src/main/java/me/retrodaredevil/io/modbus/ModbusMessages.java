@@ -10,7 +10,7 @@ public final class ModbusMessages {
 		int length = byteData.length;
 		int[] data = new int[length];
 		for(int i = 0; i < length; i++){
-			data[i] = byteData[i];
+			data[i] = byteData[i] & 0xFF;
 		}
 		return new DefaultModbusMessage(functionCode, data, byteData);
 	}
@@ -51,6 +51,9 @@ public final class ModbusMessages {
 		for(int i = 0; i < length; i++){
 			int high = data8Bit[i * 2];
 			int low = data8Bit[i * 2 + 1];
+			if(high > 0xFF || high < 0) throw new IllegalArgumentException("High value at index: " + i + " * 2 + 1 is: " + high);
+			if(low > 0xFF || low < 0) throw new IllegalArgumentException("Low value at index: " + i + " * 2 + 1 is: " + low);
+			
 			r[i] = (high << 8) | low;
 		}
 		return r;
@@ -89,14 +92,14 @@ public final class ModbusMessages {
 		@Override
 		public String toString() {
 			return "DefaultModbusMessage{" +
-					"functionCode=" + functionCode +
+					"functionCode=" + getFunctionCode() +
 					", data=" + Arrays.toString(data) +
 					'}';
 		}
 		
 		@Override
 		public int getFunctionCode() {
-			return functionCode;
+			return functionCode & 0xFF;
 		}
 		
 		@Override

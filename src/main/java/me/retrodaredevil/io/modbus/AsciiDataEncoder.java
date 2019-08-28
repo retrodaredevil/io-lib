@@ -8,13 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class AsciiDataEncoder implements IODataEncoder {
-	private final long timeout;
-	
-	public AsciiDataEncoder(long timeout){
-		this.timeout = timeout;
-	}
 	public AsciiDataEncoder() {
-		this(1000);
 	}
 	
 	@Override
@@ -128,6 +122,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 		return fromAscii(expectedAddress, bytes);
 	}
 	private byte[] readLine(InputStream inputStream) throws IOException{
+		// TODO add optional timeout parameters to class
 		List<Byte> bytes = new ArrayList<>();
 		boolean started = false;
 		boolean cr = false;
