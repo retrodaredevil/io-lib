@@ -40,6 +40,7 @@ public final class RedundancyUtil {
 		}
 		return crc;
 	}
+	@Deprecated
 	public static int flipCRC(int crc){
 		int high = (crc & (0xFF << 8)) >> 8;
 		int low = crc & 0xFF;

@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 
 import static me.retrodaredevil.io.modbus.ModbusMessages.get16BitDataFrom8BitArray;
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,7 +34,8 @@ final class ModbusTest {
 		int[] data = { 0x01, 0x06, 0xE0, 0x1D, 0x00, 0x08};
 		
 		// In modbus, the low byte is first then the high byte. This is why we have to flip them
-		assertEquals(RedundancyUtil.flipCRC(0x2FCA), RedundancyUtil.calculateCRC(data));
+//		assertEquals(RedundancyUtil.flipCRC(0x2FCA), RedundancyUtil.calculateCRC(data));
+		assertEquals(0xCA2F, RedundancyUtil.calculateCRC(data));
 	}
 	@Test
 	void testAsciiEncoding(){
@@ -54,7 +54,7 @@ final class ModbusTest {
 					0x49, (byte) 0xF6
 			});
 			OutputStream output = new ByteArrayOutputStream();
-			ModbusSlave slave = new IOModbusSlave(responseStream, output, encoder);
+			ModbusSlaveBus slave = new IOModbusSlaveBus(responseStream, output, encoder);
 			
 			slave.sendMessage(1, new SingleWriteHandler(0x010A, 1, false));
 		}
@@ -70,7 +70,7 @@ final class ModbusTest {
 					(byte) (crc & 0xFF), (byte) ((crc & 0xFF00) >> 8)
 			});
 			OutputStream output = new ByteArrayOutputStream();
-			ModbusSlave slave = new IOModbusSlave(responseStream, output, encoder);
+			ModbusSlaveBus slave = new IOModbusSlaveBus(responseStream, output, encoder);
 			
 			slave.sendMessage(1, new MultipleWriteHandler(0x010A, new int[] {
 					31, 71, 98, 43
@@ -87,7 +87,7 @@ final class ModbusTest {
 					(byte) (crc & 0xFF), (byte) ((crc & 0xFF00) >> 8)
 			});
 			OutputStream output = new ByteArrayOutputStream();
-			ModbusSlave slave = new IOModbusSlave(responseStream, output, encoder);
+			ModbusSlaveBus slave = new IOModbusSlaveBus(responseStream, output, encoder);
 			
 			int[] registers = slave.sendMessage(1, new ReadRegistersHandler(0x010A, 3)); // this will have a length of 3
 			assertArrayEquals(get16BitDataFrom8BitArray(99, 67, 85, 45, 92, 91), registers);
