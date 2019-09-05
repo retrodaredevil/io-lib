@@ -7,7 +7,7 @@ import me.retrodaredevil.io.IOBundle;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class JSerialIOBundle implements IOBundle, AutoCloseable {
+public class JSerialIOBundle implements IOBundle {
 	private final InputStream inputStream;
 	private final OutputStream outputStream;
 	private final SerialPort serialPort;
@@ -15,9 +15,6 @@ public class JSerialIOBundle implements IOBundle, AutoCloseable {
 	public JSerialIOBundle(SerialPort serialPort, SerialConfig serialConfig){
 		this.serialPort = serialPort;
 		serialPort.openPort(1000);
-//		serialPort.setComPortParameters(19200, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
-//		serialPort.setDTR();
-//		serialPort.clearRTS();
 		final int stopBits;
 		switch(serialConfig.getStopBits()){
 			case ONE: stopBits = SerialPort.ONE_STOP_BIT; break;
