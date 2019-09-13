@@ -10,6 +10,14 @@ public class SerialConfigBuilder implements SerialConfig {
 	private Parity parity = Parity.NONE;
 	private boolean rts = false, dtr = false;
 	
+	public SerialConfigBuilder(SerialConfig serialConfig){
+		baudRate = serialConfig.getBaudRateValue();
+		dataBits = serialConfig.getDataBitsValue();
+		stopBits = serialConfig.getStopBits();
+		parity = serialConfig.getParity();
+		rts = serialConfig.isRTS();
+		dtr = serialConfig.isDTR();
+	}
 	public SerialConfigBuilder(int baudRate){
 		this.baudRate = baudRate;
 	}
