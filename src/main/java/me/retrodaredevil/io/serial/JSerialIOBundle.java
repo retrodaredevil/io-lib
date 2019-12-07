@@ -7,14 +7,18 @@ import me.retrodaredevil.io.IOBundle;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import static java.util.Objects.requireNonNull;
+
 public class JSerialIOBundle implements IOBundle {
 	private final InputStream inputStream;
 	private final OutputStream outputStream;
 	private final SerialPort serialPort;
 	
-	public JSerialIOBundle(SerialPort serialPort, SerialConfig serialConfig){
+	public JSerialIOBundle(SerialPort serialPort, SerialConfig serialConfig) throws SerialPortException {
 		this.serialPort = serialPort;
-		serialPort.openPort(1000);
+		if(!serialPort.openPort(1000)){
+			throw new SerialPortException("Was unsuccessful while trying to open port: " + serialPort.toString());
+		}
 		final int stopBits;
 		switch(serialConfig.getStopBits()){
 			case ONE: stopBits = SerialPort.ONE_STOP_BIT; break;
@@ -42,8 +46,8 @@ public class JSerialIOBundle implements IOBundle {
 		} else {
 			serialPort.clearDTR();
 		}
-		inputStream = serialPort.getInputStream();
-		outputStream = serialPort.getOutputStream();
+		inputStream = requireNonNull(serialPort.getInputStream());
+		outputStream = requireNonNull(serialPort.getOutputStream());
 	}
 	
 	public static JSerialIOBundle createFromPortIndex(int index, SerialConfig serialConfig) throws SerialPortException {
