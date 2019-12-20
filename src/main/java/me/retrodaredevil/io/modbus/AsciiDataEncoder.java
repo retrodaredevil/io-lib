@@ -89,9 +89,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 		}
 		int actualLrc = RedundancyUtil.calculateLRC(data);
 		if(expectedLrc != actualLrc){
-			System.err.println(Arrays.toString(bytes));
-			System.err.println(Arrays.toString(data));
-			throw new RedundancyException("LRC", expectedLrc, actualLrc);
+			throw new RedundancyException("LRC", expectedLrc, actualLrc, "bytes: " + Arrays.toString(bytes));
 		}
 		return ModbusMessages.createMessage(functionCode, data);
 	}

@@ -10,9 +10,14 @@ import java.util.List;
 public class RTUDataEncoder implements IODataEncoder {
 	private final long initialTimeout;
 	private final long endMillis;
-	public RTUDataEncoder(long initialTimeout, long endMillis){
+	private final long sleepTime;
+	public RTUDataEncoder(long initialTimeout, long endMillis, long sleepTime){
 		this.initialTimeout = initialTimeout;
 		this.endMillis = endMillis;
+		this.sleepTime = sleepTime;
+	}
+	public RTUDataEncoder(long initialTimeout, long endMillis){
+		this(initialTimeout, endMillis, 3);
 	}
 	public RTUDataEncoder(){
 		this(1000, 10);
@@ -37,9 +42,6 @@ public class RTUDataEncoder implements IODataEncoder {
 		bytes[1] = code;
 		
 		System.arraycopy(data, 0, bytes, 2, data.length);
-//		for(int i = 0; i < data.length; i++){
-//			bytes[i + 2] = data[i];
-//		}
 		bytes[data.length + 2] = lowCrc;
 		bytes[data.length + 3] = highCrc;
 		return bytes;
@@ -69,9 +71,7 @@ public class RTUDataEncoder implements IODataEncoder {
 		int expectedCrc = 0xFFFF & ((highCrc << 8) | lowCrc);
 		int actualCrc = RedundancyUtil.calculateCRC(getCrcBytes(address, code, data));
 		if(expectedCrc != actualCrc){
-			System.out.println(Arrays.toString(bytes));
-			System.out.println(Arrays.toString(data));
-			throw new RedundancyException("CRC", expectedCrc, actualCrc);
+			throw new RedundancyException("CRC", expectedCrc, actualCrc, "bytes: " + Arrays.toString(bytes));
 		}
 		
 		return ModbusMessages.createMessage(code, data);
@@ -102,7 +102,7 @@ public class RTUDataEncoder implements IODataEncoder {
 				long currentTime = System.currentTimeMillis();
 				if(lastData == null){ // not started
 					if(startTime + initialTimeout < currentTime){
-						throw new ModbusTimeoutException("Timed out!");
+						throw new ModbusTimeoutException("Timed out! startTime=" + startTime + " currentTime=" + currentTime + " initialTimeout=" + initialTimeout);
 					}
 				} else {
 					if(lastData + endMillis < currentTime){
@@ -116,7 +116,7 @@ public class RTUDataEncoder implements IODataEncoder {
 				}
 			}
 			try{
-				Thread.sleep(3);
+				Thread.sleep(sleepTime);
 			} catch(InterruptedException ex){
 				throw new RuntimeException(ex);
 			}

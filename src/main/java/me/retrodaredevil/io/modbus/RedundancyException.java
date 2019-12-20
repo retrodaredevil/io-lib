@@ -1,9 +1,12 @@
 package me.retrodaredevil.io.modbus;
 
 public class RedundancyException extends ModbusRuntimeException {
-	
 	public RedundancyException(String redundancyType, int expected, int actual){
-		this("Incorrect " + redundancyType + " checksum. Expected: " + expected + " but got: " + actual);
+		this(redundancyType, expected, actual, "");
+	}
+
+	public RedundancyException(String redundancyType, int expected, int actual, String extra){
+		this("Incorrect " + redundancyType + " checksum. Expected: " + expected + " but got: " + actual + (extra.isEmpty() ? "" : " " + extra));
 	}
 	
 	public RedundancyException() {

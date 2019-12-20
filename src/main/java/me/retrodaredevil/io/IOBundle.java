@@ -19,6 +19,7 @@ public interface IOBundle extends AutoCloseable {
 	 * This should be overridden by subclasses to close the input and output streams
 	 * @throws Exception If this cannot be closed
 	 */
+	@SuppressWarnings("RedundantThrows")
 	@Override
 	default void close() throws Exception {
 	}
