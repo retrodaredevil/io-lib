@@ -16,8 +16,8 @@ public class JSerialIOBundle implements IOBundle {
 	
 	public JSerialIOBundle(SerialPort serialPort, SerialConfig serialConfig) throws SerialPortException {
 		this.serialPort = serialPort;
-		if(!serialPort.openPort(1000)){
-			throw new SerialPortException("Was unsuccessful while trying to open port: " + serialPort.toString());
+		if(!serialPort.openPort(0)){
+			throw new SerialPortException("Was unsuccessful while trying to open port: " + serialPort.getSystemPortName() + " descriptive name: " + serialPort.getDescriptivePortName() + " description: " + serialPort.getPortDescription());
 		}
 		final int stopBits;
 		switch(serialConfig.getStopBits()){
