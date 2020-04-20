@@ -13,6 +13,7 @@ that has been tested. This library aims to provide an open source heavily object
 * Create custom function codes by implementing `MessageHandler`
 * Total freedom to extend any class and override its behavior
 * Supports Ascii and RTU encoding. Also create your own custom encoding by implementing `IODataEncoder`
+* Supports CRC and LRC checksums. Automatically checks one or the other based on encoding type (Ascii or RTU)
 
 ## TODO
 * Implement Modbus exception codes and throw Java Exceptions corresponding to them

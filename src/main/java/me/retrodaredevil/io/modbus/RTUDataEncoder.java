@@ -15,6 +15,9 @@ public class RTUDataEncoder implements IODataEncoder {
 		this.initialTimeout = initialTimeout;
 		this.endMillis = endMillis;
 		this.sleepTime = sleepTime;
+		if(sleepTime < 0){
+			throw new IllegalArgumentException("sleepTime cannot be less than 0! sleepTime=" + sleepTime);
+		}
 	}
 	public RTUDataEncoder(long initialTimeout, long endMillis){
 		this(initialTimeout, endMillis, 3);
@@ -115,10 +118,12 @@ public class RTUDataEncoder implements IODataEncoder {
 					}
 				}
 			}
-			try{
-				Thread.sleep(sleepTime);
-			} catch(InterruptedException ex){
-				throw new RuntimeException(ex);
+			if(sleepTime != 0) {
+				try {
+					Thread.sleep(sleepTime);
+				} catch (InterruptedException ex) {
+					throw new RuntimeException(ex);
+				}
 			}
 		}
 	}
