@@ -27,7 +27,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 	public static char[] toAscii(int address, ModbusMessage message){
 		byte code = message.getByteFunctionCode();
 		int[] data = message.getData();
-		int lrc = RedundancyUtil.calculateLRC(data);
+		int lrc = RedundancyUtil.calculateLrc(data);
 		
 		int length = 9 + data.length * 2;
 		char[] chars = new char[length];
@@ -87,7 +87,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 		if(address != expectedAddress){
 			throw new UnexpectedSlaveResponseException(expectedAddress, address);
 		}
-		int actualLrc = RedundancyUtil.calculateLRC(data);
+		int actualLrc = RedundancyUtil.calculateLrc(data);
 		if(expectedLrc != actualLrc){
 			throw new RedundancyException("LRC", expectedLrc, actualLrc, "bytes: " + Arrays.toString(bytes));
 		}

@@ -10,8 +10,8 @@ public class ImmutableAddressModbusSlave implements ModbusSlave {
 	}
 	
 	@Override
-	public ModbusMessage sendMessage(ModbusMessage message) {
-		return modbus.sendMessage(address, message);
+	public ModbusMessage sendRequestMessage(ModbusMessage message) {
+		return modbus.sendRequestMessage(address, message);
 	}
 	
 }

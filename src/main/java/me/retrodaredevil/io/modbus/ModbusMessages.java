@@ -5,7 +5,14 @@ import java.util.Objects;
 
 public final class ModbusMessages {
 	private ModbusMessages(){ throw new UnsupportedOperationException(); }
-	
+
+	public static boolean isFunctionCodeError(int functionCode) {
+		return (functionCode & 0x80) != 0; // the 8th bit is set
+	}
+	public static boolean isFunctionCodeError(byte functionCode) {
+		return (functionCode & 0x80) != 0; // the 8th bit is set
+	}
+
 	public static ModbusMessage createMessage(byte functionCode, byte[] byteData){
 		int length = byteData.length;
 		int[] data = new int[length];
@@ -14,6 +21,12 @@ public final class ModbusMessages {
 		}
 		return new DefaultModbusMessage(functionCode, data, byteData);
 	}
+
+	/**
+	 * @param functionCode The function code
+	 * @param data The array with 8 bit data
+	 * @return A {@link ModbusMessage} with the specified function code and data
+	 */
 	public static ModbusMessage createMessage(int functionCode, int[] data){
 		int length = data.length;
 		byte[] byteData = new byte[length];
@@ -22,7 +35,15 @@ public final class ModbusMessages {
 		}
 		return new DefaultModbusMessage((byte) functionCode, data, byteData);
 	}
-	
+
+	public static ModbusMessage createExceptionMessage(int functionCode, int exceptionCode) {
+	    return createExceptionMessage((byte) functionCode, (byte) exceptionCode);
+	}
+
+	public static ModbusMessage createExceptionMessage(byte functionCode, byte exceptionCode) {
+		return createMessage((byte) (functionCode | 0x80), new byte[] { exceptionCode });
+	}
+
 	/**
 	 * NOTE: Do not call this for the CRC!
 	 * @param data16Bit An array of ints where each element represents a 16 bit number.
@@ -41,7 +62,7 @@ public final class ModbusMessages {
 		}
 		return r;
 	}
-	public static int[] get16BitDataFrom8BitArray(int ...data8Bit){
+	public static int[] get16BitDataFrom8BitArray(int... data8Bit){
 		int originalLength = data8Bit.length;
 		if(originalLength % 2 == 1){
 			throw new IllegalArgumentException("The length must be a multiple of two! length: " + originalLength);
@@ -91,10 +112,10 @@ public final class ModbusMessages {
 		
 		@Override
 		public String toString() {
-			return "DefaultModbusMessage{" +
+			return "DefaultModbusMessage(" +
 					"functionCode=" + getFunctionCode() +
 					", data=" + Arrays.toString(data) +
-					'}';
+					')';
 		}
 		
 		@Override

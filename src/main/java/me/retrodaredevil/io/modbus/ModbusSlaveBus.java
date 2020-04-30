@@ -9,14 +9,14 @@ import me.retrodaredevil.io.modbus.handling.MessageHandler;
 public interface ModbusSlaveBus {
 	/**
 	 * Sends a message to the specified slave
-	 * @param address
-	 * @param message
-	 * @return
+	 * @param address The address of the slave
+	 * @param message The message to send to the slave
+	 * @return The response from the slave
 	 */
-	ModbusMessage sendMessage(int address, ModbusMessage message);
+	ModbusMessage sendRequestMessage(int address, ModbusMessage message);
 	
-	default <T> T sendMessage(int address, MessageHandler<T> messageHandler){
-		ModbusMessage response = sendMessage(address, messageHandler.createMessage());
+	default <T> T sendRequestMessage(int address, MessageHandler<T> messageHandler){
+		ModbusMessage response = sendRequestMessage(address, messageHandler.createRequest());
 		return messageHandler.handleResponse(response);
 	}
 }

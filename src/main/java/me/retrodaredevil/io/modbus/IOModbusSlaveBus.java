@@ -21,7 +21,7 @@ public class IOModbusSlaveBus implements ModbusSlaveBus {
 	}
 	
 	@Override
-	public ModbusMessage sendMessage(int address, ModbusMessage message) {
+	public ModbusMessage sendRequestMessage(int address, ModbusMessage message) {
 		formatter.sendMessage(outputStream, address, message);
 		return formatter.readMessage(address, inputStream);
 	}

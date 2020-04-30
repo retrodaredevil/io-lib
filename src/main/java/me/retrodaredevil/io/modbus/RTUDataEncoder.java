@@ -37,7 +37,7 @@ public class RTUDataEncoder implements IODataEncoder {
 	public static byte[] toBytes(int address, ModbusMessage message){
 		byte code = message.getByteFunctionCode();
 		byte[] data = message.getByteData();
-		int crc = RedundancyUtil.calculateCRC(getCrcBytes((byte) address, code, data));
+		int crc = RedundancyUtil.calculateCrc(getCrcBytes((byte) address, code, data));
 		byte highCrc = (byte) ((crc & 0xFF00) >> 8);
 		byte lowCrc = (byte) (crc & 0xFF);
 		byte[] bytes = new byte[4 + data.length];
@@ -72,7 +72,7 @@ public class RTUDataEncoder implements IODataEncoder {
 			throw new UnexpectedSlaveResponseException(expectedAddress, address);
 		}
 		int expectedCrc = 0xFFFF & ((highCrc << 8) | lowCrc);
-		int actualCrc = RedundancyUtil.calculateCRC(getCrcBytes(address, code, data));
+		int actualCrc = RedundancyUtil.calculateCrc(getCrcBytes(address, code, data));
 		if(expectedCrc != actualCrc){
 			throw new RedundancyException("CRC", expectedCrc, actualCrc, "bytes: " + Arrays.toString(bytes));
 		}

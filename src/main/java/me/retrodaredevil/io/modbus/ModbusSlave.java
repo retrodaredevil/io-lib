@@ -11,10 +11,10 @@ public interface ModbusSlave {
 	 * @param message
 	 * @return
 	 */
-	ModbusMessage sendMessage(ModbusMessage message);
+	ModbusMessage sendRequestMessage(ModbusMessage message);
 	
-	default <T> T sendMessage(MessageHandler<T> messageHandler){
-		ModbusMessage response = sendMessage(messageHandler.createMessage());
+	default <T> T sendRequestMessage(MessageHandler<T> messageHandler){
+		ModbusMessage response = sendRequestMessage(messageHandler.createRequest());
 		return messageHandler.handleResponse(response);
 	}
 }

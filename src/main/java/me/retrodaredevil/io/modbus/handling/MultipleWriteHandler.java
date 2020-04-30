@@ -3,11 +3,17 @@ package me.retrodaredevil.io.modbus.handling;
 import me.retrodaredevil.io.modbus.FunctionCode;
 import me.retrodaredevil.io.modbus.ModbusMessage;
 import me.retrodaredevil.io.modbus.ModbusMessages;
+import me.retrodaredevil.io.modbus.parsing.MessageParseException;
 
-public class MultipleWriteHandler implements MessageHandler<Void> {
+import java.util.Arrays;
+
+import static me.retrodaredevil.io.modbus.ModbusMessages.get16BitDataFrom8BitArray;
+
+public class MultipleWriteHandler implements MessageResponseCreator<Void> {
 	private final int register;
 	private final int[] data8Bit;
 	private final boolean checkRegister;
+	@Deprecated
 	public MultipleWriteHandler(int register, int[] data8Bit, boolean checkRegister){
 		this.register = register;
 		this.data8Bit = data8Bit;
@@ -19,8 +25,48 @@ public class MultipleWriteHandler implements MessageHandler<Void> {
 	public MultipleWriteHandler(int register, int[] data8Bit){
 		this(register, data8Bit, true);
 	}
+	public static MultipleWriteHandler parseFromRequestData(int[] data) throws MessageParseException {
+	    if (data.length % 2 != 1) { // the array's length is not odd // if it is even
+	    	throw new MessageParseException("data.length is even! It must be odd! data.length=" + data.length);
+		}
+	    if (data.length <= 5) {
+	    	throw new MessageParseException("data.length must be greater than 5 and must be odd! So must be >= 7. data.length=" + data.length);
+		}
+		int register = data[0] << 8 | data[1];
+		int numberOfRegisters = data[2] << 8 | data[3];
+		int numberOfBytes = data[4];
+		if (numberOfBytes != numberOfRegisters * 2) {
+			throw new MessageParseException("numberOfBytes=" + numberOfBytes + " and numberOfRegisters=" + numberOfRegisters + "! numberOfBytes must equal numberOfRegisters * 2!");
+		}
+		if (data.length - 5 != numberOfBytes) {
+			throw new MessageParseException("data.length - 5 must equal numberOfBytes! data.length=" + data.length + " numberOfBytes=" + numberOfBytes);
+		}
+		int[] data8Bit = Arrays.copyOfRange(data, 5, data.length);
+		return new MultipleWriteHandler(register, data8Bit);
+	}
+
+	/**
+	 * @return The register to write to
+	 */
+	public int getRegister() {
+		return register;
+	}
+
+	/**
+	 * @return The 8 bit data array of values to write. The length is always a multiple of 2
+	 */
+	public int[] getData8Bit() {
+		return data8Bit;
+	}
+	/**
+	 * @return The 16 bit data array of values to write.
+	 */
+	public int[] getData16Bit() {
+		return get16BitDataFrom8BitArray(data8Bit);
+	}
+
 	@Override
-	public ModbusMessage createMessage() {
+	public ModbusMessage createRequest() {
 		int[] data = new int[5 + data8Bit.length];
 		data[0] = (register & 0xFF00) >> 8;
 		data[1] = register & 0xFF;
@@ -51,5 +97,15 @@ public class MultipleWriteHandler implements MessageHandler<Void> {
 			throw new ResponseLengthException(expectedNumberOfRegisters, setNumberOfRegisters);
 		}
 		return null;
+	}
+
+	@Override
+	public ModbusMessage createResponse(Void data) {
+		int numberOfRegisters = data8Bit.length / 2;
+		int[] data8Bit = new int[] {
+				register >> 8, register & 0xFF,
+				numberOfRegisters >> 8, numberOfRegisters & 0xFF
+		};
+		return ModbusMessages.createMessage(FunctionCode.WRITE_MULTIPLE_REGISTERS, data8Bit);
 	}
 }

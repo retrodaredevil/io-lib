@@ -3,14 +3,14 @@ package me.retrodaredevil.io.modbus;
 public final class RedundancyUtil {
 	private RedundancyUtil(){ throw new UnsupportedOperationException(); }
 	
-	public static int calculateLRC(int[] bytes){
+	public static int calculateLrc(int[] bytes){
 		int sum = 0;
 		for(int a : bytes){
 			sum += a;
 		}
 		return 0xFF & (-((byte) (sum & 0xFF)));
 	}
-	public static int calculateCRC(int... bytes){
+	public static int calculateCrc(int... bytes){
 		int crc = 0xFFFF;
 		for(int b : bytes){
 			crc ^= b & 0xFF;
@@ -25,7 +25,7 @@ public final class RedundancyUtil {
 		}
 		return crc;
 	}
-	public static int calculateCRC(byte... bytes){
+	public static int calculateCrc(byte... bytes){
 		int crc = 0xFFFF;
 		for(int b : bytes){
 			crc ^= b & 0xFF;
@@ -41,7 +41,7 @@ public final class RedundancyUtil {
 		return crc;
 	}
 	@Deprecated
-	public static int flipCRC(int crc){
+	public static int flipCrc(int crc){
 		int high = (crc & (0xFF << 8)) >> 8;
 		int low = crc & 0xFF;
 		return (low << 8) | high;
