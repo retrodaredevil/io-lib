@@ -13,10 +13,12 @@ public class JSerialIOBundle implements IOBundle {
 	private final InputStream inputStream;
 	private final OutputStream outputStream;
 	private final SerialPort serialPort;
-	
 	public JSerialIOBundle(SerialPort serialPort, SerialConfig serialConfig) throws SerialPortException {
+		this(serialPort, serialConfig, Config.DEFAULT);
+	}
+	public JSerialIOBundle(SerialPort serialPort, SerialConfig serialConfig, Config jSerialConfig) throws SerialPortException {
 		this.serialPort = serialPort;
-		if(!serialPort.openPort(0)){
+		if(!serialPort.openPort(jSerialConfig.safetySleepTimeMillis, jSerialConfig.deviceSendQueueSize, jSerialConfig.deviceReceiveQueueSize)){
 			throw new SerialPortException("Was unsuccessful while trying to open port: " + serialPort.getSystemPortName() + " descriptive name: " + serialPort.getDescriptivePortName() + " description: " + serialPort.getPortDescription());
 		}
 		final int stopBits;
@@ -49,8 +51,8 @@ public class JSerialIOBundle implements IOBundle {
 		inputStream = requireNonNull(serialPort.getInputStream());
 		outputStream = requireNonNull(serialPort.getOutputStream());
 	}
-	
-	public static JSerialIOBundle createFromPortIndex(int index, SerialConfig serialConfig) throws SerialPortException {
+
+	public static SerialPort createSerialPortFromIndex(int index) throws SerialPortException {
 		final SerialPort[] ports;
 		try {
 			ports = SerialPort.getCommPorts();
@@ -60,19 +62,30 @@ public class JSerialIOBundle implements IOBundle {
 		if(index >= ports.length){
 			throw new SerialPortException("There are only " + ports.length + " serial ports! index=" + index);
 		}
-		SerialPort port = ports[index];
-		return new JSerialIOBundle(port, serialConfig);
+		return ports[index];
 	}
-	public static JSerialIOBundle createPort(String port, SerialConfig serialConfig) throws SerialPortException {
-		final SerialPort serialPort;
+	
+	public static JSerialIOBundle createFromPortIndex(int index, SerialConfig serialConfig) throws SerialPortException {
+		return new JSerialIOBundle(createSerialPortFromIndex(index), serialConfig);
+	}
+	public static SerialPort createSerialPortFromName(String port) throws SerialPortException {
 		try {
-			serialPort = SerialPort.getCommPort(port);
+			return SerialPort.getCommPort(port);
 		} catch(SerialPortInvalidPortException e){
 			throw new SerialPortException("invalid port! port: " + port, e);
 		}
-		return new JSerialIOBundle(serialPort, serialConfig);
 	}
-	
+	public static JSerialIOBundle createPort(String port, SerialConfig serialConfig) throws SerialPortException {
+		return new JSerialIOBundle(createSerialPortFromName(port), serialConfig);
+	}
+
+	/**
+	 * @return The raw jSerialComm {@link SerialPort}. You likely don't need to configure this, but if you do, here you go!
+	 */
+	public SerialPort getSerialPort() {
+		return serialPort;
+	}
+
 	@Override
 	public void close() {
 		serialPort.closePort();
@@ -86,5 +99,22 @@ public class JSerialIOBundle implements IOBundle {
 	@Override
 	public OutputStream getOutputStream() {
 		return outputStream;
+	}
+
+	/**
+	 * Contains JSerial specific config settings
+	 */
+	public static class Config {
+	    public static final Config DEFAULT = new Config(0, 4096, 4096);
+
+		private final int safetySleepTimeMillis;
+		private final int deviceSendQueueSize;
+		private final int deviceReceiveQueueSize;
+
+		public Config(int safetySleepTimeMillis, int deviceSendQueueSize, int deviceReceiveQueueSize) {
+			this.safetySleepTimeMillis = safetySleepTimeMillis;
+			this.deviceSendQueueSize = deviceSendQueueSize;
+			this.deviceReceiveQueueSize = deviceReceiveQueueSize;
+		}
 	}
 }

@@ -1,6 +1,8 @@
 package me.retrodaredevil.io.serial;
 
-public class SerialPortException extends Exception {
+import java.io.IOException;
+
+public class SerialPortException extends IOException {
 	public SerialPortException() {
 	}
 	
@@ -16,7 +18,4 @@ public class SerialPortException extends Exception {
 		super(cause);
 	}
 	
-	public SerialPortException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
 }
