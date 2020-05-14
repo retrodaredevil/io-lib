@@ -31,7 +31,7 @@ public class RTUDataEncoder implements IODataEncoder {
 		try {
 			outputStream.write(bytes);
 		} catch (IOException e) {
-			throw new ModbusRuntimeException(e);
+			throw new ModbusRuntimeException("Got exception while writing", e);
 		}
 	}
 	public static byte[] toBytes(int address, ModbusMessage message){
@@ -56,7 +56,7 @@ public class RTUDataEncoder implements IODataEncoder {
 		try {
 			bytes = readBytes(inputStream);
 		} catch(IOException e){
-			throw new RuntimeException(e);
+			throw new ModbusRuntimeException("Got exception while reading", e);
 		}
 		return fromBytes(expectedAddress, bytes);
 	}

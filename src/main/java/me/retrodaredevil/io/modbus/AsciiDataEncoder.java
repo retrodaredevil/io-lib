@@ -21,7 +21,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 		try {
 			outputStream.write(bytes);
 		} catch (IOException e) {
-			throw new ModbusRuntimeException(e);
+			throw new ModbusRuntimeException("Got exception while writing", e);
 		}
 	}
 	public static char[] toAscii(int address, ModbusMessage message){
@@ -115,7 +115,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 		try {
 			bytes = readLine(inputStream);
 		} catch (IOException e) {
-			throw new ModbusRuntimeException(e);
+			throw new ModbusRuntimeException("Got exception while reading", e);
 		}
 		return fromAscii(expectedAddress, bytes);
 	}
