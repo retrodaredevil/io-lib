@@ -1,5 +1,7 @@
 package me.retrodaredevil.io.modbus;
 
+import me.retrodaredevil.io.modbus.handling.ResponseLengthException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -62,15 +64,18 @@ public class RTUDataEncoder implements IODataEncoder {
 	}
 	public static ModbusMessage fromBytes(int expectedAddress, byte[] bytes){
 		int length = bytes.length;
+		if (length < 4) {
+			throw new ResponseLengthException("Unexpected length: " + length + ". bytes: " + Arrays.toString(bytes) + ". We expected address: " + expectedAddress);
+		}
 		byte address = bytes[0];
+		if(address != expectedAddress){
+			throw new UnexpectedSlaveResponseException(expectedAddress, address);
+		}
 		byte code = bytes[1];
 		byte[] data = new byte[length - 4];
 		System.arraycopy(bytes, 2, data, 0, length - 4);
 		int lowCrc = bytes[length - 2] & 0xFF;
 		int highCrc = bytes[length - 1] & 0xFF;
-		if(address != expectedAddress){
-			throw new UnexpectedSlaveResponseException(expectedAddress, address);
-		}
 		int expectedCrc = 0xFFFF & ((highCrc << 8) | lowCrc);
 		int actualCrc = RedundancyUtil.calculateCrc(getCrcBytes(address, code, data));
 		if(expectedCrc != actualCrc){

@@ -14,12 +14,7 @@ public final class ModbusMessages {
 	}
 
 	public static ModbusMessage createMessage(byte functionCode, byte[] byteData){
-		int length = byteData.length;
-		int[] data = new int[length];
-		for(int i = 0; i < length; i++){
-			data[i] = byteData[i] & 0xFF;
-		}
-		return new DefaultModbusMessage(functionCode, data, byteData);
+		return new DefaultModbusMessage(functionCode, convert8BitArray(byteData), byteData);
 	}
 
 	/**
@@ -28,12 +23,7 @@ public final class ModbusMessages {
 	 * @return A {@link ModbusMessage} with the specified function code and data
 	 */
 	public static ModbusMessage createMessage(int functionCode, int[] data){
-		int length = data.length;
-		byte[] byteData = new byte[length];
-		for(int i = 0; i < length; i++){
-			byteData[i] = (byte) data[i];
-		}
-		return new DefaultModbusMessage((byte) functionCode, data, byteData);
+		return new DefaultModbusMessage((byte) functionCode, data, convert8BitArray(data));
 	}
 
 	public static ModbusMessage createExceptionMessage(int functionCode, int exceptionCode) {
@@ -76,6 +66,27 @@ public final class ModbusMessages {
 			if(low > 0xFF || low < 0) throw new IllegalArgumentException("Low value at index: " + i + " * 2 + 1 is: " + low);
 			
 			r[i] = (high << 8) | low;
+		}
+		return r;
+	}
+	public static byte[] convert8BitArray(int... data8Bit) {
+		byte[] r = new byte[data8Bit.length];
+		for (int i = 0; i < data8Bit.length; i++) {
+			int value = data8Bit[i];
+			if (value < 0) {
+				throw new IllegalArgumentException("Value at index=" + i + " is less than 0! value=" + value);
+			}
+			if (value > 255) {
+				throw new IllegalArgumentException("Value at index=" + i + " is greater than 255! value=" + value);
+			}
+			r[i] = (byte) value;
+		}
+		return r;
+	}
+	public static int[] convert8BitArray(byte... data8Bit) {
+		int[] r = new int[data8Bit.length];
+		for (int i = 0; i < data8Bit.length; i++) {
+			r[i] = data8Bit[i] & 0xFF;
 		}
 		return r;
 	}

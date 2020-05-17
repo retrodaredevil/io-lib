@@ -54,13 +54,15 @@ public class ReadRegistersHandler implements MessageResponseCreator<int[]> {
 			throw new FunctionCodeException(FunctionCode.READ_REGISTERS, functionCode);
 		}
 		int[] allData = response.getData();
+		int expectedLength = numberOfRegisters * 2 + 1;
+		if (expectedLength != allData.length) {
+			throw new ResponseLengthException(expectedLength, allData.length);
+		}
 		int byteCount = allData[0];
 		if(byteCount != numberOfRegisters * 2){
-			throw new ResponseLengthException(numberOfRegisters * 2, byteCount);
+			throw new ResponseLengthException("Inconsistent byte count! byteCount=" + byteCount + ". expected=" + (numberOfRegisters * 2));
 		}
-		if(allData.length != byteCount + 1){
-			throw new ResponseLengthException(byteCount + 1, allData.length);
-		}
+
 		int[] data = new int[allData.length - 1];
 		System.arraycopy(allData, 1, data, 0, data.length);
 		return get16BitDataFrom8BitArray(data);

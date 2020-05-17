@@ -53,14 +53,14 @@ final class ModbusTest {
 			ByteArrayInputStream responseStream = new ByteArrayInputStream(new byte[]{
 					1,
 					6,
-					1, 0, // NOTE: This has an incorrect register, which is why we don't check the register
+                    1, 10,
 					0, 1,
-					0x49, (byte) 0xF6
+					0x69, (byte) 0xF4
 			});
 			OutputStream output = new ByteArrayOutputStream();
 			ModbusSlaveBus slave = new IOModbusSlaveBus(responseStream, output, encoder);
 			
-			slave.sendRequestMessage(1, new SingleWriteHandler(0x010A, 1, false));
+			slave.sendRequestMessage(1, new SingleWriteHandler(0x010A, 1));
 		}
 		{ // test writing multiple values
 			int crc = RedundancyUtil.calculateCrc(1, 16, 0x01, 0x0A, 0, 2);
@@ -70,7 +70,6 @@ final class ModbusTest {
 					16, // function code
 					0x01, 0x0A, // starting address
 					0, 2, // 2 registers
-//					4, // 4 bytes total
 					(byte) (crc & 0xFF), (byte) ((crc & 0xFF00) >> 8)
 			});
 			OutputStream output = new ByteArrayOutputStream();
@@ -78,7 +77,7 @@ final class ModbusTest {
 			
 			slave.sendRequestMessage(1, new MultipleWriteHandler(0x010A, new int[] {
 					31, 71, 98, 43
-			}, true));
+			}));
 		}
 		{ // test reading values
 			int crc = RedundancyUtil.calculateCrc(1, 3, 3 * 2, 99, 67, 85, 45, 92, 91);

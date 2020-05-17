@@ -8,22 +8,20 @@ import me.retrodaredevil.io.modbus.parsing.MessageParseException;
 import java.util.Arrays;
 
 import static me.retrodaredevil.io.modbus.ModbusMessages.get16BitDataFrom8BitArray;
+import static me.retrodaredevil.io.modbus.ModbusMessages.convert8BitArray;
 
 public class MultipleWriteHandler implements MessageResponseCreator<Void> {
 	private final int register;
 	private final int[] data8Bit;
-	private final boolean checkRegister;
-	@Deprecated
-	public MultipleWriteHandler(int register, int[] data8Bit, boolean checkRegister){
+	public MultipleWriteHandler(int register, int[] data8Bit){
 		this.register = register;
 		this.data8Bit = data8Bit;
-		this.checkRegister = checkRegister;
 		if(data8Bit.length % 2 != 0){
 			throw new IllegalArgumentException("Length of data8Bit must be a multiple of two!");
 		}
 	}
-	public MultipleWriteHandler(int register, int[] data8Bit){
-		this(register, data8Bit, true);
+	public MultipleWriteHandler(int register, byte[] data8Bit) {
+		this(register, convert8BitArray(data8Bit));
 	}
 	public static MultipleWriteHandler parseFromRequestData(int[] data) throws MessageParseException {
 	    if (data.length % 2 != 1) { // the array's length is not odd // if it is even
@@ -85,16 +83,17 @@ public class MultipleWriteHandler implements MessageResponseCreator<Void> {
 			throw new FunctionCodeException(FunctionCode.WRITE_MULTIPLE_REGISTERS, functionCode);
 		}
 		int[] data = response.getData();
-		if(checkRegister) {
-			int setRegister = (data[0] << 8) | data[1];
-			if (setRegister != register) {
-				throw new WriteRegisterException(register, setRegister);
-			}
+		if (data.length != 4) {
+			throw new ResponseLengthException("Expected a length of 4! Got" + data.length + " instead. data: " + Arrays.toString(data));
+		}
+		int setRegister = (data[0] << 8) | data[1];
+		if (setRegister != register) {
+			throw new WriteRegisterException(register, setRegister);
 		}
 		int setNumberOfRegisters = (data[2] << 8) | data[3];
 		int expectedNumberOfRegisters = data8Bit.length / 2;
 		if(setNumberOfRegisters != expectedNumberOfRegisters){
-			throw new ResponseLengthException(expectedNumberOfRegisters, setNumberOfRegisters);
+			throw new WriteRegistersException("Tried writing to " + expectedNumberOfRegisters + " but actually wrote to " + setNumberOfRegisters + " registers. Start register was correct: " + register);
 		}
 		return null;
 	}

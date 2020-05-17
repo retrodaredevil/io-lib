@@ -1,5 +1,7 @@
 package me.retrodaredevil.io.modbus;
 
+import me.retrodaredevil.io.modbus.handling.ResponseLengthException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -74,6 +76,9 @@ public class AsciiDataEncoder implements IODataEncoder {
 	 * @return
 	 */
 	public static ModbusMessage fromAscii(int expectedAddress, byte[] bytes){
+		if (bytes.length < 6) {
+			throw new ResponseLengthException("Unexpected length: " + bytes.length + ". bytes: " + Arrays.toString(bytes) + ". We expected address: " + expectedAddress);
+		}
 		int address = fromAscii(bytes[0], bytes[1]);
 		int functionCode = fromAscii(bytes[2], bytes[3]);
 		int length = (bytes.length - 6) / 2;

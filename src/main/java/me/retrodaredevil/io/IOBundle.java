@@ -19,7 +19,6 @@ public interface IOBundle extends AutoCloseable {
 	 * This should be overridden by subclasses to close the input and output streams
 	 * @throws Exception If this cannot be closed
 	 */
-	@SuppressWarnings("RedundantThrows")
 	@Override
 	default void close() throws Exception {
 	}
@@ -45,7 +44,34 @@ public interface IOBundle extends AutoCloseable {
 			}
 		};
 	}
-	
+	/**
+	 * NOTE: Calling close() will close {@code inputStream} then {@code outputStream}
+	 * @param inputStream The {@link InputStream} to return in {@link #getInputStream()}
+	 * @param outputStream The {@link OutputStream} to return in {@link #getOutputStream()}
+	 * @return An immutable {@link IOBundle} representing {@code inputStream} and {@code outputStream}
+	 */
+	static IOBundle ofWithClose(final InputStream inputStream, final OutputStream outputStream){
+		requireNonNull(inputStream);
+		requireNonNull(outputStream);
+		return new IOBundle() {
+			@Override
+			public InputStream getInputStream() {
+				return inputStream;
+			}
+
+			@Override
+			public OutputStream getOutputStream() {
+				return outputStream;
+			}
+
+			@Override
+			public void close() throws Exception {
+				inputStream.close();
+				outputStream.close();
+			}
+		};
+	}
+
 	final class Defaults {
 		private Defaults(){ throw new UnsupportedOperationException(); }
 		/**
