@@ -14,6 +14,22 @@ This library aims to provide an open source heavily object oriented approach to 
 * Supports CRC and LRC checksums. Automatically checks CRC while using RTU and LRC while using Ascii.
 * Parse ModbusMessages (allows you to easily respond to a master).
 
+## Importing
+[![](https://jitpack.io/v/retrodaredevil/io-lib.svg)](https://jitpack.io/#retrodaredevil/io-lib)
+```groovy
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+dependencies {
+    implementation 'com.github.retrodaredevil:io-lib:<LATEST RELEASE>'
+}
+```
+
+
 ## Examples
 Building a serial config:
 ```java
