@@ -27,7 +27,7 @@ public final class ModbusMessages {
 	}
 
 	public static ModbusMessage createExceptionMessage(int functionCode, int exceptionCode) {
-	    return createExceptionMessage((byte) functionCode, (byte) exceptionCode);
+		return createExceptionMessage((byte) functionCode, (byte) exceptionCode);
 	}
 
 	public static ModbusMessage createExceptionMessage(byte functionCode, byte exceptionCode) {

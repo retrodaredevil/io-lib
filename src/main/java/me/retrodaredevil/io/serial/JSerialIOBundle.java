@@ -105,7 +105,7 @@ public class JSerialIOBundle implements IOBundle {
 	 * Contains JSerial specific config settings
 	 */
 	public static class Config {
-	    public static final Config DEFAULT = new Config(0, 4096, 4096);
+		public static final Config DEFAULT = new Config(0, 4096, 4096);
 
 		private final int safetySleepTimeMillis;
 		private final int deviceSendQueueSize;

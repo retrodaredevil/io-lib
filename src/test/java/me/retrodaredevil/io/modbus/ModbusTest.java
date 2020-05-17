@@ -53,7 +53,7 @@ final class ModbusTest {
 			ByteArrayInputStream responseStream = new ByteArrayInputStream(new byte[]{
 					1,
 					6,
-                    1, 10,
+					1, 10,
 					0, 1,
 					0x69, (byte) 0xF4
 			});

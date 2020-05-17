@@ -24,11 +24,11 @@ public class MultipleWriteHandler implements MessageResponseCreator<Void> {
 		this(register, convert8BitArray(data8Bit));
 	}
 	public static MultipleWriteHandler parseFromRequestData(int[] data) throws MessageParseException {
-	    if (data.length % 2 != 1) { // the array's length is not odd // if it is even
-	    	throw new MessageParseException("data.length is even! It must be odd! data.length=" + data.length);
+		if (data.length % 2 != 1) { // the array's length is not odd // if it is even
+			throw new MessageParseException("data.length is even! It must be odd! data.length=" + data.length);
 		}
-	    if (data.length <= 5) {
-	    	throw new MessageParseException("data.length must be greater than 5 and must be odd! So must be >= 7. data.length=" + data.length);
+		if (data.length <= 5) {
+			throw new MessageParseException("data.length must be greater than 5 and must be odd! So must be >= 7. data.length=" + data.length);
 		}
 		int register = data[0] << 8 | data[1];
 		int numberOfRegisters = data[2] << 8 | data[3];

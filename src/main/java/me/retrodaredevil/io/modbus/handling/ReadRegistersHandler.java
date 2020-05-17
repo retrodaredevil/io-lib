@@ -23,8 +23,8 @@ public class ReadRegistersHandler implements MessageResponseCreator<int[]> {
 		this.numberOfRegisters = numberOfRegisters;
 	}
 	public static ReadRegistersHandler parseFromRequestData(int[] data) throws MessageParseException {
-	    if (data.length != 4) {
-	    	throw new MessageParseException("data.length != 4! data.length=" + data.length);
+		if (data.length != 4) {
+			throw new MessageParseException("data.length != 4! data.length=" + data.length);
 		}
 		return new ReadRegistersHandler(
 				data[0] << 8 | data[1],
@@ -73,7 +73,7 @@ public class ReadRegistersHandler implements MessageResponseCreator<int[]> {
 		if (data16Bit.length != numberOfRegisters) {
 			throw new IllegalArgumentException("The array of 16 bit integers passed was not the correct length! numberOfRegisters=" + numberOfRegisters + ". The passed data should have that length.");
 		}
-	    int[] data = get8BitDataFrom16BitArray(data16Bit);
+		int[] data = get8BitDataFrom16BitArray(data16Bit);
 		int byteCount = numberOfRegisters * 2;
 		if (data.length != byteCount) {
 			throw new AssertionError("We just checked this. This is a code problem.");
