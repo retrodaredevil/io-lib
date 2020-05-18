@@ -2,21 +2,26 @@ package me.retrodaredevil.io.modbus.parsing;
 
 import me.retrodaredevil.io.modbus.FunctionCode;
 import me.retrodaredevil.io.modbus.ModbusMessage;
-import me.retrodaredevil.io.modbus.handling.MessageHandler;
-import me.retrodaredevil.io.modbus.handling.WriteMultipleRegistersHandler;
-import me.retrodaredevil.io.modbus.handling.ReadRegistersHandler;
-import me.retrodaredevil.io.modbus.handling.WriteSingleRegisterHandler;
+import me.retrodaredevil.io.modbus.handling.*;
 
 public class DefaultMessageParser implements MessageParser {
 	@Override
 	public MessageHandler<?> parseRequestMessage(ModbusMessage message) throws MessageParseException {
 		switch(message.getFunctionCode()) {
+			case FunctionCode.READ_COIL:
+				return ReadCoils.parseFromRequestData(message.getData());
+			case FunctionCode.READ_DISCRETE_INPUT:
+				return ReadDiscreteInputs.parseFromRequestData(message.getData());
 			case FunctionCode.READ_REGISTERS:
-				return ReadRegistersHandler.parseFromRequestData(message.getData());
+				return ReadHoldingRegisters.parseFromRequestData(message.getData());
+			case FunctionCode.WRITE_SINGLE_COIL:
+				return WriteSingleCoil.parseFromRequestData(message.getData());
 			case FunctionCode.WRITE_SINGLE_REGISTER:
-				return WriteSingleRegisterHandler.parseFromRequestData(message.getData());
+				return WriteSingleRegister.parseFromRequestData(message.getData());
+			case FunctionCode.WRITE_MULTIPLE_COILS:
+				return WriteMultipleCoils.parseFromRequestData(message.getData());
 			case FunctionCode.WRITE_MULTIPLE_REGISTERS:
-				return WriteMultipleRegistersHandler.parseFromRequestData(message.getData());
+				return WriteMultipleRegisters.parseFromRequestData(message.getData());
 		}
 		return null;
 	}

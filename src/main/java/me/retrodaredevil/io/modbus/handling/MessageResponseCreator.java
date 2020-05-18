@@ -7,6 +7,7 @@ public interface MessageResponseCreator<T> extends MessageHandler<T> {
 	 * Creates a response message with the specified data
 	 * @param data The data to put in the returned response message
 	 * @return A response {@link ModbusMessage} with the specified data
+	 * @throws IllegalArgumentException If {@code data} is not valid
 	 */
 	ModbusMessage createResponse(T data);
 }

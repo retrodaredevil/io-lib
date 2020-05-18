@@ -14,17 +14,19 @@ public class TcpExample {
 			socket.setSoTimeout(500);
 			ModbusSlaveBus modbusSlaveBus = new TcpModbusSlaveBus(socket);
 
-			MessageHandler<int[]> read = new ReadRegistersHandler(100, 1);
+			MessageHandler<int[]> read = new ReadHoldingRegisters(100, 1);
 
 			int previous = modbusSlaveBus.sendRequestMessage(1, read)[0];
 			System.out.println("Was: " + previous);
-			modbusSlaveBus.sendRequestMessage(1, new WriteSingleRegisterHandler(100, random.nextInt(1 << 16)));
+			modbusSlaveBus.sendRequestMessage(1, new WriteSingleRegister(100, random.nextInt(1 << 16)));
 			int value = modbusSlaveBus.sendRequestMessage(1, read)[0];
 			System.out.println("Now is: " + value);
 
-			modbusSlaveBus.sendRequestMessage(1, new WriteMultipleCoilsHandler(30, new boolean[] { false, true, true }));
-			System.out.println("Coil at 30 to 32: " + Arrays.toString(modbusSlaveBus.sendRequestMessage(1, new ReadCoilHandler(30, 3))));
-			System.out.println("Discrete input at 30: " + Arrays.toString(modbusSlaveBus.sendRequestMessage(1, new ReadDiscreteInputHandler(30, 1))));
+			modbusSlaveBus.sendRequestMessage(1, new WriteMultipleCoils(30, new boolean[] { false, true, true }));
+			modbusSlaveBus.sendRequestMessage(1, new WriteSingleCoil(33, false));
+			modbusSlaveBus.sendRequestMessage(1, new WriteSingleCoil(34, true));
+			System.out.println("Coil at 30 to 34: " + Arrays.toString(modbusSlaveBus.sendRequestMessage(1, new ReadCoils(30, 5))));
+			System.out.println("Discrete input at 30: " + Arrays.toString(modbusSlaveBus.sendRequestMessage(1, new ReadDiscreteInputs(30, 1))));
 		}
 	}
 }

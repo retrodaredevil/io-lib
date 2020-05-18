@@ -19,6 +19,7 @@ TCP? No problem.
 
 ## Drawbacks
 * Not set up for asynchronous requests
+* Not set up for multiple requests at once for TCP (you must request and wait for response)
 
 ## Importing
 [![](https://jitpack.io/v/retrodaredevil/io-lib.svg)](https://jitpack.io/#retrodaredevil/io-lib)
@@ -58,7 +59,7 @@ ModbusSlave slave = new ImmutableAddressModbusSlave(options.getModbusAddress(), 
 ```
 Using modbus:
 ```java
-private static final MessageHandler<int[]> BATTERY_VOLTAGE = new ReadRegistersHandler(0x0101, 1);
+private static final MessageHandler<int[]> BATTERY_VOLTAGE = new ReadRegisters(0x0101, 1);
 private final ModbusSlave slave = ...;
 public float getBatteryVoltage() {
     return slave.sendRequestMessage(BATTERY_VOLTAGE)[0] / 10.0F;
@@ -101,3 +102,4 @@ If you want to test this library, you can use https://www.modbusdriver.com/diags
 
 ## TODO
 * Implement Modbus exception codes and throw Java Exceptions corresponding to them
+* Support two byte slave addressing

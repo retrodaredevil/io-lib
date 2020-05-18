@@ -1,9 +1,6 @@
 package me.retrodaredevil.io.modbus;
 
-import me.retrodaredevil.io.modbus.handling.MessageResponseCreator;
-import me.retrodaredevil.io.modbus.handling.WriteMultipleRegistersHandler;
-import me.retrodaredevil.io.modbus.handling.ReadRegistersHandler;
-import me.retrodaredevil.io.modbus.handling.WriteSingleRegisterHandler;
+import me.retrodaredevil.io.modbus.handling.*;
 import me.retrodaredevil.io.modbus.parsing.DefaultMessageParser;
 import me.retrodaredevil.io.modbus.parsing.MessageParseException;
 import me.retrodaredevil.io.modbus.parsing.MessageParser;
@@ -60,7 +57,7 @@ final class ModbusTest {
 			OutputStream output = new ByteArrayOutputStream();
 			ModbusSlaveBus slave = new IOModbusSlaveBus(responseStream, output, encoder);
 
-			slave.sendRequestMessage(1, new WriteSingleRegisterHandler(0x010A, 1));
+			slave.sendRequestMessage(1, new WriteSingleRegister(0x010A, 1));
 		}
 		{ // test writing multiple values
 			int crc = RedundancyUtil.calculateCrc(1, 16, 0x01, 0x0A, 0, 2);
@@ -75,7 +72,7 @@ final class ModbusTest {
 			OutputStream output = new ByteArrayOutputStream();
 			ModbusSlaveBus slave = new IOModbusSlaveBus(responseStream, output, encoder);
 
-			slave.sendRequestMessage(1, new WriteMultipleRegistersHandler(0x010A, new int[] {
+			slave.sendRequestMessage(1, new WriteMultipleRegisters(0x010A, new int[] {
 					31, 71, 98, 43
 			}));
 		}
@@ -92,13 +89,13 @@ final class ModbusTest {
 			OutputStream output = new ByteArrayOutputStream();
 			ModbusSlaveBus slave = new IOModbusSlaveBus(responseStream, output, encoder);
 
-			ReadRegistersHandler readRegistersHandler = new ReadRegistersHandler(0x010A, 3);
-			ModbusMessage message = readRegistersHandler.createRequest();
+			ReadHoldingRegisters readHoldingRegisters = new ReadHoldingRegisters(0x010A, 3);
+			ModbusMessage message = readHoldingRegisters.createRequest();
 			ModbusMessage response = slave.sendRequestMessage(1, message); // this will have a length of 3
-			int[] registers = readRegistersHandler.handleResponse(response);
+			int[] registers = readHoldingRegisters.handleResponse(response);
 			assertArrayEquals(get16BitDataFrom8BitArray(99, 67, 85, 45, 92, 91), registers);
 
-			ModbusMessage expectedResponse = readRegistersHandler.createResponse(registers);
+			ModbusMessage expectedResponse = readHoldingRegisters.createResponse(registers);
 			assertEquals(expectedResponse.getFunctionCode(), response.getFunctionCode());
 			assertArrayEquals(expectedResponse.getData(), response.getData());
 		}
@@ -116,10 +113,10 @@ final class ModbusTest {
 	void testResponse() {
 		{
 			int[] exampleData = new int[] { 0x20F, 43, 0xFFF, 0x1FA0};
-			assertArrayEquals(exampleData, getResponseData(new ReadRegistersHandler(0xEA0, 4), exampleData));
+			assertArrayEquals(exampleData, getResponseData(new ReadHoldingRegisters(0xEA0, 4), exampleData));
 		}
-		assertNull(getResponseData(new WriteSingleRegisterHandler(0xEA0, 0xFFFF), null));
-		assertNull(getResponseData(new WriteMultipleRegistersHandler(0xEA0, new int[] { 127, 127, 0, 43}), null));
+		assertNull(getResponseData(new WriteSingleRegister(0xEA0, 0xFFFF), null));
+		assertNull(getResponseData(new WriteMultipleRegisters(0xEA0, new int[] { 127, 127, 0, 43}), null));
 	}
 	private <T> T getResponseData(MessageResponseCreator<T> messageResponseCreator, T data) {
 		ModbusMessage requestMessage = messageResponseCreator.createRequest();
@@ -131,9 +128,17 @@ final class ModbusTest {
 	@Test
 	void testParse() throws MessageParseException {
 		MessageParser parser = new DefaultMessageParser();
-		assertTrue(parser.parseRequestMessage(new ReadRegistersHandler(5, 1).createRequest()) instanceof ReadRegistersHandler);
-		assertTrue(parser.parseRequestMessage(new WriteSingleRegisterHandler(5, 2).createRequest()) instanceof WriteSingleRegisterHandler);
-		assertTrue(parser.parseRequestMessage(new WriteMultipleRegistersHandler(5, new int[] { 127, 127, 0, 43}).createRequest()) instanceof WriteMultipleRegistersHandler);
+		testParser(parser, new ReadCoils(5, 5));
+		testParser(parser, new ReadDiscreteInputs(5, 5));
+		testParser(parser, new ReadHoldingRegisters(5, 1));
+		testParser(parser, new WriteSingleCoil(5, true));
+		testParser(parser, new WriteSingleRegister(5, 2));
+		testParser(parser, new WriteMultipleCoils(5, new boolean[] { true, true, false }));
+		testParser(parser, new WriteMultipleRegisters(5, new int[] { 127, 127, 0, 43}));
+	}
+	private void testParser(MessageParser parser, MessageHandler<?> messageHandler) throws MessageParseException {
+		MessageHandler<?> result = parser.parseRequestMessage(messageHandler.createRequest());
+		assertEquals(messageHandler, result);
 	}
 
 }

@@ -5,43 +5,56 @@ import me.retrodaredevil.io.modbus.ModbusMessage;
 import me.retrodaredevil.io.modbus.ModbusMessages;
 import me.retrodaredevil.io.modbus.parsing.MessageParseException;
 
+import java.util.Objects;
+
 import static me.retrodaredevil.io.modbus.ModbusMessages.get16BitDataFrom8BitArray;
 import static me.retrodaredevil.io.modbus.ModbusMessages.get8BitDataFrom16BitArray;
 
-public class ReadRegistersHandler implements MessageResponseCreator<int[]> {
-
-	private final int register;
+public class ReadHoldingRegisters extends BaseStartingDataAddress implements MessageResponseCreator<int[]> {
 	private final int numberOfRegisters;
 
 	/**
 	 *
-	 * @param register The starting register
+	 * @param startingDataAddress The starting register
 	 * @param numberOfRegisters The number of registers to read. The array returned from {@link #handleResponse(ModbusMessage)} will have a length of this
 	 */
-	public ReadRegistersHandler(int register, int numberOfRegisters) {
-		this.register = register;
+	public ReadHoldingRegisters(int startingDataAddress, int numberOfRegisters) {
+		super(startingDataAddress);
 		this.numberOfRegisters = numberOfRegisters;
 	}
-	public static ReadRegistersHandler parseFromRequestData(int[] data) throws MessageParseException {
+	public static ReadHoldingRegisters parseFromRequestData(int[] data) throws MessageParseException {
 		if (data.length != 4) {
 			throw new MessageParseException("data.length != 4! data.length=" + data.length);
 		}
-		return new ReadRegistersHandler(
+		return new ReadHoldingRegisters(
 				data[0] << 8 | data[1],
 				data[2] << 8 | data[3]
 		);
 	}
 
-	public int getRegister() {
-		return register;
-	}
+	@Deprecated
+	public int getRegister() { return getStartingDataAddress(); }
 	public int getNumberOfRegisters() {
 		return numberOfRegisters;
 	}
 
 	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		ReadHoldingRegisters that = (ReadHoldingRegisters) o;
+		return getStartingDataAddress() == that.getStartingDataAddress() &&
+				getNumberOfRegisters() == that.getNumberOfRegisters();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(getStartingDataAddress(), getNumberOfRegisters());
+	}
+
+	@Override
 	public ModbusMessage createRequest() {
-		return ModbusMessages.createMessage(FunctionCode.READ_REGISTERS, get8BitDataFrom16BitArray(register, numberOfRegisters));
+		return ModbusMessages.createMessage(FunctionCode.READ_REGISTERS, get8BitDataFrom16BitArray(getStartingDataAddress(), numberOfRegisters));
 	}
 
 	@Override
