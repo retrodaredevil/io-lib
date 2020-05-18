@@ -29,7 +29,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 		}
 	}
 	public static char[] toAscii(int address, ModbusMessage message){
-		byte code = message.getByteFunctionCode();
+		int functionCode = message.getFunctionCode();
 		int[] data = message.getData();
 		int lrc = RedundancyUtil.calculateLrc(data);
 
@@ -39,7 +39,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 		char[] addressAscii = toAscii(address);
 		chars[1] = addressAscii[0];
 		chars[2] = addressAscii[1];
-		char[] functionAscii = toAscii(code);
+		char[] functionAscii = toAscii(functionCode);
 		chars[3] = functionAscii[0];
 		chars[4] = functionAscii[1];
 
@@ -103,14 +103,15 @@ public class AsciiDataEncoder implements IODataEncoder {
 	private static int fromAscii(byte high, byte low){
 		int r = 0;
 		if(high >= 'A'){
-			r += (high - 65 + 10) << 4;
+//			r += (high - 65 + 10) << 4;
+			r += ((high & 0xFF) - 55) << 4;
 		} else {
-			r += (high - 0x30) << 4;
+			r += ((high & 0xFF) - 0x30) << 4;
 		}
 		if(low >= 'A'){
-			r += low - 65 + 10;
+			r += (low & 0xFF) - 55;
 		} else {
-			r += low - 0x30;
+			r += (low & 0xFF) - 0x30;
 		}
 
 		return r;

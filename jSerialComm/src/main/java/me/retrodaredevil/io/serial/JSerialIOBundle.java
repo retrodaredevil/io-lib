@@ -64,7 +64,7 @@ public class JSerialIOBundle implements IOBundle {
 		}
 		return ports[index];
 	}
-	
+
 	public static JSerialIOBundle createFromPortIndex(int index, SerialConfig serialConfig) throws SerialPortException {
 		return new JSerialIOBundle(createSerialPortFromIndex(index), serialConfig);
 	}
@@ -90,12 +90,12 @@ public class JSerialIOBundle implements IOBundle {
 	public void close() {
 		serialPort.closePort();
 	}
-	
+
 	@Override
 	public InputStream getInputStream() {
 		return inputStream;
 	}
-	
+
 	@Override
 	public OutputStream getOutputStream() {
 		return outputStream;
