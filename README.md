@@ -32,7 +32,8 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.github.retrodaredevil:io-lib:<LATEST RELEASE>'
+    implementation 'com.github.retrodaredevil.io-lib:core:<LATEST RELEASE>'
+    implementation 'com.github.retrodaredevil.io-lib:jSerialComm:<LATEST RELEASE>'
 }
 ```
 
@@ -79,8 +80,7 @@ Since almost everything in this library is immutable you usually don't have to w
 objects because they don't have mutable state. 
 
 If you do use this asynchronously, remember that you cannot make two requests to two different devices because they
-may come back out of order, which the library does not support. However, if you wanted to, you could send two requests
-to a single modbus slave over Ascii serial. That has not been tested, but it should work.
+may come back out of order, which the library does not support.
 
 ## 8 Bit and 16 Bit
 Since this project deals with Modbus, there are times when code is dealing with 8 bit data or 16 bit data.
