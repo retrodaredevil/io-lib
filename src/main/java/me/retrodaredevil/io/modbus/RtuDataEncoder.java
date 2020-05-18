@@ -2,6 +2,7 @@ package me.retrodaredevil.io.modbus;
 
 import me.retrodaredevil.io.modbus.handling.ResponseLengthException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -9,11 +10,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class RTUDataEncoder implements IODataEncoder {
+public class RtuDataEncoder implements IODataEncoder {
 	private final long initialTimeout;
 	private final long endMillis;
 	private final long sleepTime;
-	public RTUDataEncoder(long initialTimeout, long endMillis, long sleepTime){
+	public RtuDataEncoder(long initialTimeout, long endMillis, long sleepTime){
 		this.initialTimeout = initialTimeout;
 		this.endMillis = endMillis;
 		this.sleepTime = sleepTime;
@@ -21,10 +22,10 @@ public class RTUDataEncoder implements IODataEncoder {
 			throw new IllegalArgumentException("sleepTime cannot be less than 0! sleepTime=" + sleepTime);
 		}
 	}
-	public RTUDataEncoder(long initialTimeout, long endMillis){
+	public RtuDataEncoder(long initialTimeout, long endMillis){
 		this(initialTimeout, endMillis, 3);
 	}
-	public RTUDataEncoder(){
+	public RtuDataEncoder(){
 		this(1000, 10);
 	}
 	@Override
@@ -32,6 +33,7 @@ public class RTUDataEncoder implements IODataEncoder {
 		byte[] bytes = toBytes(address, message);
 		try {
 			outputStream.write(bytes);
+			outputStream.flush(); // most serial implementations you don't have to do this, but it's good practice
 		} catch (IOException e) {
 			throw new ModbusRuntimeException("Got exception while writing", e);
 		}
@@ -45,13 +47,13 @@ public class RTUDataEncoder implements IODataEncoder {
 		byte[] bytes = new byte[4 + data.length];
 		bytes[0] = (byte) address;
 		bytes[1] = code;
-		
+
 		System.arraycopy(data, 0, bytes, 2, data.length);
 		bytes[data.length + 2] = lowCrc;
 		bytes[data.length + 3] = highCrc;
 		return bytes;
 	}
-	
+
 	@Override
 	public ModbusMessage readMessage(int expectedAddress, InputStream inputStream) {
 		final byte[] bytes;
@@ -81,7 +83,7 @@ public class RTUDataEncoder implements IODataEncoder {
 		if(expectedCrc != actualCrc){
 			throw new RedundancyException("CRC", expectedCrc, actualCrc, "bytes: " + Arrays.toString(bytes));
 		}
-		
+
 		return ModbusMessages.createMessage(code, data);
 	}
 	private static byte[] getCrcBytes(byte address, byte functionCode, byte[] data){
@@ -93,7 +95,7 @@ public class RTUDataEncoder implements IODataEncoder {
 	}
 	private byte[] readBytes(InputStream inputStream) throws IOException {
 		byte[] buffer = new byte[1024];
-		List<Byte> bytes = new ArrayList<>();
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 		long startTime = System.currentTimeMillis();
 		Long lastData = null;
 		while(true){
@@ -104,7 +106,7 @@ public class RTUDataEncoder implements IODataEncoder {
 				}
 				lastData = System.currentTimeMillis();
 				for(int i = 0; i < len; i++){
-					bytes.add(buffer[i]);
+					bytes.write(buffer[i]);
 				}
 			} else {
 				long currentTime = System.currentTimeMillis();
@@ -114,12 +116,7 @@ public class RTUDataEncoder implements IODataEncoder {
 					}
 				} else {
 					if(lastData + endMillis < currentTime){
-						int size = bytes.size();
-						byte[] r = new byte[size];
-						for(int i = 0; i < size; i++){
-							r[i] = bytes.get(i);
-						}
-						return r;
+						return bytes.toByteArray();
 					}
 				}
 			}

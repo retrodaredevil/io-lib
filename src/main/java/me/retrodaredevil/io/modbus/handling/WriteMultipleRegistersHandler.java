@@ -10,20 +10,20 @@ import java.util.Arrays;
 import static me.retrodaredevil.io.modbus.ModbusMessages.get16BitDataFrom8BitArray;
 import static me.retrodaredevil.io.modbus.ModbusMessages.convert8BitArray;
 
-public class MultipleWriteHandler implements MessageResponseCreator<Void> {
+public class WriteMultipleRegistersHandler implements MessageResponseCreator<Void> {
 	private final int register;
 	private final int[] data8Bit;
-	public MultipleWriteHandler(int register, int[] data8Bit){
+	public WriteMultipleRegistersHandler(int register, int[] data8Bit){
 		this.register = register;
 		this.data8Bit = data8Bit;
 		if(data8Bit.length % 2 != 0){
 			throw new IllegalArgumentException("Length of data8Bit must be a multiple of two!");
 		}
 	}
-	public MultipleWriteHandler(int register, byte[] data8Bit) {
+	public WriteMultipleRegistersHandler(int register, byte[] data8Bit) {
 		this(register, convert8BitArray(data8Bit));
 	}
-	public static MultipleWriteHandler parseFromRequestData(int[] data) throws MessageParseException {
+	public static WriteMultipleRegistersHandler parseFromRequestData(int[] data) throws MessageParseException {
 		if (data.length % 2 != 1) { // the array's length is not odd // if it is even
 			throw new MessageParseException("data.length is even! It must be odd! data.length=" + data.length);
 		}
@@ -40,7 +40,7 @@ public class MultipleWriteHandler implements MessageResponseCreator<Void> {
 			throw new MessageParseException("data.length - 5 must equal numberOfBytes! data.length=" + data.length + " numberOfBytes=" + numberOfBytes);
 		}
 		int[] data8Bit = Arrays.copyOfRange(data, 5, data.length);
-		return new MultipleWriteHandler(register, data8Bit);
+		return new WriteMultipleRegistersHandler(register, data8Bit);
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class MultipleWriteHandler implements MessageResponseCreator<Void> {
 		System.arraycopy(data8Bit, 0, data, 5, data8Bit.length);
 		return ModbusMessages.createMessage(FunctionCode.WRITE_MULTIPLE_REGISTERS, data);
 	}
-	
+
 	@Override
 	public Void handleResponse(ModbusMessage response) {
 		int functionCode = response.getFunctionCode();

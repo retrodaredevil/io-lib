@@ -9,22 +9,22 @@ import java.util.Arrays;
 
 import static me.retrodaredevil.io.modbus.ModbusMessages.get16BitDataFrom8BitArray;
 
-public class SingleWriteHandler implements MessageResponseCreator<Void> {
+public class WriteSingleRegisterHandler implements MessageResponseCreator<Void> {
 	// https://www.modbustools.com/modbus.html#function06
-	
+
 	private final int register;
 	private final int value;
 
-	public SingleWriteHandler(int register, int value) {
+	public WriteSingleRegisterHandler(int register, int value) {
 		this.register = register;
 		this.value = value;
 	}
-	public static SingleWriteHandler parseFromRequestData(int[] data) throws MessageParseException {
+	public static WriteSingleRegisterHandler parseFromRequestData(int[] data) throws MessageParseException {
 		if (data.length != 4) {
 			throw new MessageParseException("data.length != 4! data.length=" + data.length);
 		}
 		int[] data16Bit = get16BitDataFrom8BitArray(data);
-		return new SingleWriteHandler(data16Bit[0], data16Bit[1]);
+		return new WriteSingleRegisterHandler(data16Bit[0], data16Bit[1]);
 	}
 
 	/**
@@ -44,7 +44,7 @@ public class SingleWriteHandler implements MessageResponseCreator<Void> {
 	public ModbusMessage createRequest() {
 		return ModbusMessages.createMessage(FunctionCode.WRITE_SINGLE_REGISTER, ModbusMessages.get8BitDataFrom16BitArray(register, value));
 	}
-	
+
 	@Override
 	public Void handleResponse(ModbusMessage response) {
 		int functionCode = response.getFunctionCode();

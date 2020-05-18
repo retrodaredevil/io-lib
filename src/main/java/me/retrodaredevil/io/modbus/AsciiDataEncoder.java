@@ -2,6 +2,7 @@ package me.retrodaredevil.io.modbus;
 
 import me.retrodaredevil.io.modbus.handling.ResponseLengthException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,7 +13,7 @@ import java.util.List;
 public class AsciiDataEncoder implements IODataEncoder {
 	public AsciiDataEncoder() {
 	}
-	
+
 	@Override
 	public void sendMessage(OutputStream outputStream, int address, ModbusMessage message) {
 		char[] chars = toAscii(address, message);
@@ -22,6 +23,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 		}
 		try {
 			outputStream.write(bytes);
+			outputStream.flush(); // most serial implementations you don't have to do this, but it's good practice
 		} catch (IOException e) {
 			throw new ModbusRuntimeException("Got exception while writing", e);
 		}
@@ -30,7 +32,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 		byte code = message.getByteFunctionCode();
 		int[] data = message.getData();
 		int lrc = RedundancyUtil.calculateLrc(data);
-		
+
 		int length = 9 + data.length * 2;
 		char[] chars = new char[length];
 		chars[0] = ':';
@@ -40,7 +42,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 		char[] functionAscii = toAscii(code);
 		chars[3] = functionAscii[0];
 		chars[4] = functionAscii[1];
-		
+
 		for(int i = 0; i < data.length; i++){
 			char[] ascii = toAscii(data[i]);
 			chars[5 + i * 2] = ascii[0];
@@ -68,7 +70,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 //		return (char) (b + 65 - 10);
 		return (char) (b + 55);
 	}
-	
+
 	/**
 	 *
 	 * @param expectedAddress The expected address in the data
@@ -110,10 +112,10 @@ public class AsciiDataEncoder implements IODataEncoder {
 		} else {
 			r += low - 0x30;
 		}
-		
+
 		return r;
 	}
-	
+
 	@Override
 	public ModbusMessage readMessage(int expectedAddress, InputStream inputStream) {
 		final byte[] bytes;
@@ -126,7 +128,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 	}
 	private byte[] readLine(InputStream inputStream) throws IOException{
 		// TODO add optional timeout parameters to class
-		List<Byte> bytes = new ArrayList<>();
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 		boolean started = false;
 		boolean cr = false;
 		while(true){
@@ -145,14 +147,10 @@ public class AsciiDataEncoder implements IODataEncoder {
 				} else if(next == '\r'){
 					cr = true;
 				} else {
-					bytes.add((byte) next);
+					bytes.write((byte) next);
 				}
 			}
 		}
-		byte[] r = new byte[bytes.size()];
-		for(int i = 0; i < r.length; i++){
-			r[i] = bytes.get(i);
-		}
-		return r;
+		return bytes.toByteArray();
 	}
 }

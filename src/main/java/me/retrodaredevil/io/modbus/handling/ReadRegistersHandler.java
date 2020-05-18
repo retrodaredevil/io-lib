@@ -9,10 +9,10 @@ import static me.retrodaredevil.io.modbus.ModbusMessages.get16BitDataFrom8BitArr
 import static me.retrodaredevil.io.modbus.ModbusMessages.get8BitDataFrom16BitArray;
 
 public class ReadRegistersHandler implements MessageResponseCreator<int[]> {
-	
+
 	private final int register;
 	private final int numberOfRegisters;
-	
+
 	/**
 	 *
 	 * @param register The starting register
@@ -41,12 +41,9 @@ public class ReadRegistersHandler implements MessageResponseCreator<int[]> {
 
 	@Override
 	public ModbusMessage createRequest() {
-		return ModbusMessages.createMessage(FunctionCode.READ_REGISTERS, new int[] {
-				(register & 0xFF00) >> 8, register & 0xFF,
-				(numberOfRegisters & 0xFF00) >> 8, numberOfRegisters & 0xFF
-		});
+		return ModbusMessages.createMessage(FunctionCode.READ_REGISTERS, get8BitDataFrom16BitArray(register, numberOfRegisters));
 	}
-	
+
 	@Override
 	public int[] handleResponse(ModbusMessage response) {
 		int functionCode = response.getFunctionCode();

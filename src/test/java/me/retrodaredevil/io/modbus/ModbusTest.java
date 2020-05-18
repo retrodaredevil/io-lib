@@ -1,9 +1,9 @@
 package me.retrodaredevil.io.modbus;
 
 import me.retrodaredevil.io.modbus.handling.MessageResponseCreator;
-import me.retrodaredevil.io.modbus.handling.MultipleWriteHandler;
+import me.retrodaredevil.io.modbus.handling.WriteMultipleRegistersHandler;
 import me.retrodaredevil.io.modbus.handling.ReadRegistersHandler;
-import me.retrodaredevil.io.modbus.handling.SingleWriteHandler;
+import me.retrodaredevil.io.modbus.handling.WriteSingleRegisterHandler;
 import me.retrodaredevil.io.modbus.parsing.DefaultMessageParser;
 import me.retrodaredevil.io.modbus.parsing.MessageParseException;
 import me.retrodaredevil.io.modbus.parsing.MessageParser;
@@ -25,7 +25,7 @@ final class ModbusTest {
 	void testLrc(){
 		int[] data = new int[] { 17, 3, 0, 107, 0, 3 };
 		assertEquals(0x7E, RedundancyUtil.calculateLrc(data));
-		
+
 		int sum = 0;
 		for(int a : data){
 			sum += a;
@@ -36,7 +36,7 @@ final class ModbusTest {
 	@Test
 	void testCrc(){
 		int[] data = { 0x01, 0x06, 0xE0, 0x1D, 0x00, 0x08};
-		
+
 		// In modbus, the low byte is first then the high byte. This is why we have to flip them
 //		assertEquals(RedundancyUtil.flipCrc(0x2FCA), RedundancyUtil.calculateCRC(data));
 		assertEquals(0xCA2F, RedundancyUtil.calculateCrc(data));
@@ -46,8 +46,8 @@ final class ModbusTest {
 		testDataEncoder(new AsciiDataEncoder());
 	}
 	@Test
-	void testRTUEncoding(){
-		RTUDataEncoder encoder = new RTUDataEncoder();
+	void testRtuEncoding(){
+		RtuDataEncoder encoder = new RtuDataEncoder();
 		testDataEncoder(encoder);
 		{ // test writing values
 			ByteArrayInputStream responseStream = new ByteArrayInputStream(new byte[]{
@@ -59,8 +59,8 @@ final class ModbusTest {
 			});
 			OutputStream output = new ByteArrayOutputStream();
 			ModbusSlaveBus slave = new IOModbusSlaveBus(responseStream, output, encoder);
-			
-			slave.sendRequestMessage(1, new SingleWriteHandler(0x010A, 1));
+
+			slave.sendRequestMessage(1, new WriteSingleRegisterHandler(0x010A, 1));
 		}
 		{ // test writing multiple values
 			int crc = RedundancyUtil.calculateCrc(1, 16, 0x01, 0x0A, 0, 2);
@@ -74,8 +74,8 @@ final class ModbusTest {
 			});
 			OutputStream output = new ByteArrayOutputStream();
 			ModbusSlaveBus slave = new IOModbusSlaveBus(responseStream, output, encoder);
-			
-			slave.sendRequestMessage(1, new MultipleWriteHandler(0x010A, new int[] {
+
+			slave.sendRequestMessage(1, new WriteMultipleRegistersHandler(0x010A, new int[] {
 					31, 71, 98, 43
 			}));
 		}
@@ -118,8 +118,8 @@ final class ModbusTest {
 			int[] exampleData = new int[] { 0x20F, 43, 0xFFF, 0x1FA0};
 			assertArrayEquals(exampleData, getResponseData(new ReadRegistersHandler(0xEA0, 4), exampleData));
 		}
-		assertNull(getResponseData(new SingleWriteHandler(0xEA0, 0xFFFF), null));
-		assertNull(getResponseData(new MultipleWriteHandler(0xEA0, new int[] { 127, 127, 0, 43}), null));
+		assertNull(getResponseData(new WriteSingleRegisterHandler(0xEA0, 0xFFFF), null));
+		assertNull(getResponseData(new WriteMultipleRegistersHandler(0xEA0, new int[] { 127, 127, 0, 43}), null));
 	}
 	private <T> T getResponseData(MessageResponseCreator<T> messageResponseCreator, T data) {
 		ModbusMessage requestMessage = messageResponseCreator.createRequest();
@@ -132,8 +132,8 @@ final class ModbusTest {
 	void testParse() throws MessageParseException {
 		MessageParser parser = new DefaultMessageParser();
 		assertTrue(parser.parseRequestMessage(new ReadRegistersHandler(5, 1).createRequest()) instanceof ReadRegistersHandler);
-		assertTrue(parser.parseRequestMessage(new SingleWriteHandler(5, 2).createRequest()) instanceof SingleWriteHandler);
-		assertTrue(parser.parseRequestMessage(new MultipleWriteHandler(5, new int[] { 127, 127, 0, 43}).createRequest()) instanceof MultipleWriteHandler);
+		assertTrue(parser.parseRequestMessage(new WriteSingleRegisterHandler(5, 2).createRequest()) instanceof WriteSingleRegisterHandler);
+		assertTrue(parser.parseRequestMessage(new WriteMultipleRegistersHandler(5, new int[] { 127, 127, 0, 43}).createRequest()) instanceof WriteMultipleRegistersHandler);
 	}
-	
+
 }
