@@ -1,3 +1,4 @@
 rootProject.name = 'io-lib'
 include 'core'
 include 'jSerialComm'
+include 'purejavacomm'

@@ -32,8 +32,6 @@ public class ReadHoldingRegisters extends BaseStartingDataAddress implements Mes
 		);
 	}
 
-	@Deprecated
-	public int getRegister() { return getStartingDataAddress(); }
 	public int getNumberOfRegisters() {
 		return numberOfRegisters;
 	}
@@ -54,14 +52,14 @@ public class ReadHoldingRegisters extends BaseStartingDataAddress implements Mes
 
 	@Override
 	public ModbusMessage createRequest() {
-		return ModbusMessages.createMessage(FunctionCode.READ_REGISTERS, get8BitDataFrom16BitArray(getStartingDataAddress(), numberOfRegisters));
+		return ModbusMessages.createMessage(FunctionCode.READ_HOLDING_REGISTERS, get8BitDataFrom16BitArray(getStartingDataAddress(), numberOfRegisters));
 	}
 
 	@Override
 	public int[] handleResponse(ModbusMessage response) {
 		int functionCode = response.getFunctionCode();
-		if(functionCode != FunctionCode.READ_REGISTERS){
-			throw new FunctionCodeException(FunctionCode.READ_REGISTERS, functionCode);
+		if(functionCode != FunctionCode.READ_HOLDING_REGISTERS){
+			throw new FunctionCodeException(FunctionCode.READ_HOLDING_REGISTERS, functionCode);
 		}
 		int[] allData = response.getData();
 		int expectedLength = numberOfRegisters * 2 + 1;
@@ -91,6 +89,6 @@ public class ReadHoldingRegisters extends BaseStartingDataAddress implements Mes
 		int[] allData = new int[data.length + 1];
 		allData[0] = byteCount;
 		System.arraycopy(data, 0, allData, 1, data.length);
-		return ModbusMessages.createMessage(FunctionCode.READ_REGISTERS, allData);
+		return ModbusMessages.createMessage(FunctionCode.READ_HOLDING_REGISTERS, allData);
 	}
 }

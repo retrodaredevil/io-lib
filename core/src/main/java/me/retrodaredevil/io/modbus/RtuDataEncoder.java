@@ -105,9 +105,7 @@ public class RtuDataEncoder implements IODataEncoder {
 					throw new AssertionError("We check InputStream#available()! len should not be <= 0! It's: " + len);
 				}
 				lastData = System.currentTimeMillis();
-				for(int i = 0; i < len; i++){
-					bytes.write(buffer[i]);
-				}
+				bytes.write(buffer, 0, len);
 			} else {
 				long currentTime = System.currentTimeMillis();
 				if(lastData == null){ // not started

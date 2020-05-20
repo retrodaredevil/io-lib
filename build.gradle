@@ -28,13 +28,6 @@ subprojects {
     }
 }
 
-project(":jSerialComm") {
-    apply plugin: 'java'
-    dependencies {
-        api project(":core")
-    }
-}
-
 
 wrapper {
     gradleVersion = '6.4.1'

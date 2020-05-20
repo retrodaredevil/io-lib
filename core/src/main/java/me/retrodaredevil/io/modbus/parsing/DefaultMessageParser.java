@@ -12,7 +12,7 @@ public class DefaultMessageParser implements MessageParser {
 				return ReadCoils.parseFromRequestData(message.getData());
 			case FunctionCode.READ_DISCRETE_INPUT:
 				return ReadDiscreteInputs.parseFromRequestData(message.getData());
-			case FunctionCode.READ_REGISTERS:
+			case FunctionCode.READ_HOLDING_REGISTERS:
 				return ReadHoldingRegisters.parseFromRequestData(message.getData());
 			case FunctionCode.WRITE_SINGLE_COIL:
 				return WriteSingleCoil.parseFromRequestData(message.getData());

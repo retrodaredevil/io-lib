@@ -1,5 +1,6 @@
 package me.retrodaredevil.io.modbus;
 
+import me.retrodaredevil.io.modbus.handling.ResponseException;
 import me.retrodaredevil.io.modbus.handling.ResponseLengthException;
 
 import java.io.ByteArrayOutputStream;
@@ -11,6 +12,10 @@ import java.util.Arrays;
 import java.util.List;
 
 public class AsciiDataEncoder implements IODataEncoder {
+	/*
+	 * Note that since this is ascii, each byte only ever uses 7 bits, so we (sometimes) don't have to worry about negative numbers here
+	 */
+
 	public AsciiDataEncoder() {
 	}
 
@@ -75,7 +80,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 	 *
 	 * @param expectedAddress The expected address in the data
 	 * @param bytes The ascii data between the ':' and '\r' Not including ':', '\r', or '\n'
-	 * @return
+	 * @return The parsed modbus message
 	 */
 	public static ModbusMessage fromAscii(int expectedAddress, byte[] bytes){
 		if (bytes.length < 6) {
@@ -100,21 +105,20 @@ public class AsciiDataEncoder implements IODataEncoder {
 		}
 		return ModbusMessages.createMessage(functionCode, data);
 	}
+	private static int parseDigit(byte asciiValue) {
+		if (asciiValue > 'F') {
+			throw new ModbusRuntimeException("Ascii value: " + asciiValue + " is not valid!");
+		}
+		if (asciiValue >= 'A') {
+			return asciiValue - 55;
+		}
+		if (asciiValue < 0x30 || asciiValue > 0x39) {
+			throw new ModbusRuntimeException("Ascii value: " + asciiValue + " is not valid!");
+		}
+		return asciiValue - 0x30;
+	}
 	private static int fromAscii(byte high, byte low){
-		int r = 0;
-		if(high >= 'A'){
-//			r += (high - 65 + 10) << 4;
-			r += ((high & 0xFF) - 55) << 4;
-		} else {
-			r += ((high & 0xFF) - 0x30) << 4;
-		}
-		if(low >= 'A'){
-			r += (low & 0xFF) - 55;
-		} else {
-			r += (low & 0xFF) - 0x30;
-		}
-
-		return r;
+		return (parseDigit(high) << 4) + parseDigit(low);
 	}
 
 	@Override
