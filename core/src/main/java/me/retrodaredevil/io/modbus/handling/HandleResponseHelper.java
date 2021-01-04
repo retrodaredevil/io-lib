@@ -3,6 +3,8 @@ package me.retrodaredevil.io.modbus.handling;
 import me.retrodaredevil.io.modbus.ModbusMessage;
 import me.retrodaredevil.io.modbus.ModbusMessages;
 
+import java.util.Arrays;
+
 public final class HandleResponseHelper {
 	private HandleResponseHelper() { throw new UnsupportedOperationException(); }
 
@@ -11,10 +13,13 @@ public final class HandleResponseHelper {
 		if(functionCode != expectedFunctionCode) {
 			if (ModbusMessages.isFunctionCodeError(functionCode)) {
 				int[] data = response.getData();
-				if (data.length == 2) {
-					int exceptionCode = (data[1] << 8) | data[0];
-					throw new ErrorCodeException(response, expectedFunctionCode, exceptionCode);
+				if (data.length == 1) {
+					throw new ErrorCodeException(response, expectedFunctionCode, data[0]);
 				}
+				if (data.length == 0) {
+					throw new FunctionCodeException(response, expectedFunctionCode, "Expected to get " + expectedFunctionCode + " as the function code, but actually got " + response.getFunctionCode() + " and got no exception code data!");
+				}
+				throw new FunctionCodeException(response, expectedFunctionCode, "Expected to get " + expectedFunctionCode + " as the function code, but actually got " + response.getFunctionCode() + ". With exception code data: " + Arrays.toString(data));
 			}
 			throw new FunctionCodeException(response, expectedFunctionCode);
 		}
