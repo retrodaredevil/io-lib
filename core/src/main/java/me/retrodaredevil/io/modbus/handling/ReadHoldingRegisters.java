@@ -57,18 +57,12 @@ public class ReadHoldingRegisters extends BaseStartingDataAddress implements Mes
 
 	@Override
 	public int[] handleResponse(ModbusMessage response) {
-		int functionCode = response.getFunctionCode();
-		if(functionCode != FunctionCode.READ_HOLDING_REGISTERS){
-			throw new FunctionCodeException(FunctionCode.READ_HOLDING_REGISTERS, functionCode);
-		}
-		int[] allData = response.getData();
 		int expectedLength = numberOfRegisters * 2 + 1;
-		if (expectedLength != allData.length) {
-			throw new ResponseLengthException(expectedLength, allData.length);
-		}
+		HandleResponseHelper.checkResponse(response, FunctionCode.READ_HOLDING_REGISTERS, expectedLength);
+		int[] allData = response.getData();
 		int byteCount = allData[0];
 		if(byteCount != numberOfRegisters * 2){
-			throw new ResponseLengthException("Inconsistent byte count! byteCount=" + byteCount + ". expected=" + (numberOfRegisters * 2));
+			throw new ParsedResponseException(response, "Inconsistent byte count! byteCount=" + byteCount + ". expected=" + (numberOfRegisters * 2));
 		}
 
 		int[] data = new int[allData.length - 1];

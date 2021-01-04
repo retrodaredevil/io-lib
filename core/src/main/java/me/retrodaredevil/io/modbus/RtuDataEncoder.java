@@ -1,14 +1,12 @@
 package me.retrodaredevil.io.modbus;
 
-import me.retrodaredevil.io.modbus.handling.ResponseLengthException;
+import me.retrodaredevil.io.modbus.handling.RawResponseLengthException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class RtuDataEncoder implements IODataEncoder {
 	private final long initialTimeout;
@@ -67,7 +65,7 @@ public class RtuDataEncoder implements IODataEncoder {
 	public static ModbusMessage fromBytes(int expectedAddress, byte[] bytes){
 		int length = bytes.length;
 		if (length < 4) {
-			throw new ResponseLengthException("Unexpected length: " + length + ". bytes: " + Arrays.toString(bytes) + ". We expected address: " + expectedAddress);
+			throw new RawResponseLengthException(bytes, "Unexpected length: " + length + ". bytes: " + Arrays.toString(bytes) + ". We expected address: " + expectedAddress);
 		}
 		byte address = bytes[0];
 		if(address != expectedAddress){

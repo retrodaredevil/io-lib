@@ -91,22 +91,16 @@ public class WriteMultipleRegisters extends BaseStartingDataAddress implements M
 
 	@Override
 	public Void handleResponse(ModbusMessage response) {
-		int functionCode = response.getFunctionCode();
-		if(functionCode != FunctionCode.WRITE_MULTIPLE_REGISTERS){
-			throw new FunctionCodeException(FunctionCode.WRITE_MULTIPLE_REGISTERS, functionCode);
-		}
+		HandleResponseHelper.checkResponse(response, FunctionCode.WRITE_MULTIPLE_REGISTERS, 4);
 		int[] data = response.getData();
-		if (data.length != 4) {
-			throw new ResponseLengthException("Expected a length of 4! Got" + data.length + " instead. data: " + Arrays.toString(data));
-		}
 		int setRegister = (data[0] << 8) | data[1];
 		if (setRegister != getStartingDataAddress()) {
-			throw new WriteException("Tried writing to starting address: " + getStartingDataAddress() + " but actually wrote to " + setRegister);
+			throw new WriteException(response, "Tried writing to starting address: " + getStartingDataAddress() + " but actually wrote to " + setRegister);
 		}
 		int setNumberOfRegisters = (data[2] << 8) | data[3];
 		int expectedNumberOfRegisters = data8Bit.length / 2;
 		if(setNumberOfRegisters != expectedNumberOfRegisters){
-			throw new WriteException("Tried writing to " + expectedNumberOfRegisters + " registers but actually wrote to " + setNumberOfRegisters + " registers. Start register was correct: " + getStartingDataAddress());
+			throw new WriteException(response, "Tried writing to " + expectedNumberOfRegisters + " registers but actually wrote to " + setNumberOfRegisters + " registers. Start register was correct: " + getStartingDataAddress());
 		}
 		return null;
 	}

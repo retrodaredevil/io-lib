@@ -1,7 +1,5 @@
 package me.retrodaredevil.io.modbus;
 
-import me.retrodaredevil.io.modbus.handling.ResponseLengthException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -49,7 +47,7 @@ public class TcpModbusSlaveBus implements ModbusSlaveBus {
 		checkValue(inputStream.read());
 		int length = get16BitDataFrom8BitArray(checkValue(inputStream.read()), checkValue(inputStream.read()))[0];
 		if (length <= 3) {
-			throw new ResponseLengthException("length <= 3! We expected to at least get a function code! length=" + length);
+			throw new ModbusRuntimeException("length <= 3! We expected to at least get a function code! length=" + length + ". Transaction ID: " + receivedTransactionId);
 		}
 		int unitId = checkValue(inputStream.read());
 		if (unitId != address) {

@@ -5,7 +5,6 @@ import me.retrodaredevil.io.modbus.ModbusMessage;
 import me.retrodaredevil.io.modbus.ModbusMessages;
 import me.retrodaredevil.io.modbus.parsing.MessageParseException;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 import static me.retrodaredevil.io.modbus.ModbusMessages.get16BitDataFrom8BitArray;
@@ -59,20 +58,13 @@ public class WriteSingleRegister extends BaseSingleWrite implements MessageRespo
 
 	@Override
 	public Void handleResponse(ModbusMessage response) {
-		int functionCode = response.getFunctionCode();
-		if(functionCode != FunctionCode.WRITE_SINGLE_REGISTER){
-			throw new FunctionCodeException(FunctionCode.WRITE_SINGLE_REGISTER, functionCode);
-		}
-		int[] data8Bit = response.getData();
-		if(data8Bit.length != 4){
-			throw new ResponseLengthException(4, data8Bit.length);
-		}
-		int[] data = get16BitDataFrom8BitArray(data8Bit);
+		HandleResponseHelper.checkResponse(response, FunctionCode.WRITE_SINGLE_REGISTER, 4);
+		int[] data = get16BitDataFrom8BitArray(response.getData());
 		int setRegister = data[0];
-		checkDataAddress(setRegister);
+		checkDataAddress(response, setRegister);
 		int setValue = data[1];
 		if (setValue != value) {
-			throw new WriteValueException(value, setValue);
+			throw new WriteValueException(response, value, setValue);
 		}
 		return null;
 	}

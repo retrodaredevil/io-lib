@@ -128,9 +128,8 @@ If you want to test this library, you can use https://www.modbusdriver.com/diags
 * [SolarThing](https://github.com/wildmountainfarms/solarthing)
 
 ## TODO
-* Implement Modbus exception codes and throw Java Exceptions corresponding to them
 * Support two byte slave addressing
-* Check out these serial librarys
+* Check out these serial libraries
   * https://github.com/Gurux/gurux.serial.java
   * https://github.com/NeuronRobotics/nrjavaserial
   * https://github.com/fy-create/JavaSerialPort
@@ -138,3 +137,9 @@ If you want to test this library, you can use https://www.modbusdriver.com/diags
 ## References
 * http://modbus.org/docs/PI_MBUS_300.pdf
 * http://www.simplymodbus.ca/FAQ.htm
+
+## Alternatives to this library
+Don't like this library? That's cool. Here are some alternatives
+* https://github.com/digitalpetri/modbus
+* https://github.com/infiniteautomation/modbus4j
+* https://github.com/kochedykov/jlibmodbus

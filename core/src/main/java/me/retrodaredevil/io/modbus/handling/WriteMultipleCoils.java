@@ -88,21 +88,16 @@ public class WriteMultipleCoils extends BaseStartingDataAddress implements Messa
 
 	@Override
 	public Void handleResponse(ModbusMessage response) {
-		if (response.getFunctionCode() != FunctionCode.WRITE_MULTIPLE_COILS) {
-			throw new FunctionCodeException(FunctionCode.WRITE_MULTIPLE_COILS, response.getFunctionCode());
-		}
-		if (response.getData().length != 4) {
-			throw new ResponseLengthException(4, response.getData().length);
-		}
+		HandleResponseHelper.checkResponse(response, FunctionCode.WRITE_MULTIPLE_COILS, 4);
 		int[] data16Bit = get16BitDataFrom8BitArray(response.getData());
 		int receivedDataAddress = data16Bit[0];
 		int receivedNumberOfCoils = data16Bit[1];
 
 		if (receivedDataAddress != getStartingDataAddress()) {
-			throw new WriteException("receivedDataAddress didn't match dataAddress. receivedDataAddress=" + receivedDataAddress + " dataAddress=" + getStartingDataAddress());
+			throw new WriteException(response, "receivedDataAddress didn't match dataAddress. receivedDataAddress=" + receivedDataAddress + " dataAddress=" + getStartingDataAddress());
 		}
 		if (receivedNumberOfCoils != coils.length) {
-			throw new WriteException("receivedNumberOfCoils didn't match coils.length. receivedNumberOfCoils=" + receivedNumberOfCoils + " coils.length=" + coils.length);
+			throw new WriteException(response, "receivedNumberOfCoils didn't match coils.length. receivedNumberOfCoils=" + receivedNumberOfCoils + " coils.length=" + coils.length);
 		}
 		return null;
 	}

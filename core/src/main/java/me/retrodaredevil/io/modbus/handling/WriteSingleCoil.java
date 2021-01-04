@@ -58,27 +58,22 @@ public class WriteSingleCoil extends BaseSingleWrite implements MessageResponseC
 
 	@Override
 	public Void handleResponse(ModbusMessage response) {
-		if (response.getFunctionCode() != FunctionCode.WRITE_SINGLE_COIL) {
-			throw new FunctionCodeException(FunctionCode.WRITE_SINGLE_COIL, response.getFunctionCode());
-		}
-		int[] data8Bit = response.getData();
-		if (data8Bit.length != 4) {
-			throw new ResponseLengthException(4, data8Bit.length);
-		}
+		HandleResponseHelper.checkResponse(response, FunctionCode.WRITE_SINGLE_COIL, 4);
+		int[] data8Bit = response.getData(); // we already checked that the length should be 4
 		int[] data16Bit = get16BitDataFrom8BitArray(data8Bit);
 		int receivedDataAddress = data16Bit[0];
 		int writtenValue = data16Bit[1];
-		checkDataAddress(receivedDataAddress);
+		checkDataAddress(response, receivedDataAddress);
 		if (writtenValue == 0xFF00) {
 			if (!value) {
-				throw new WriteValueException("We wanted to set value to false, but it stayed true.");
+				throw new WriteValueException(response, "We wanted to set value to false, but it stayed true.");
 			}
 		} else if (writtenValue == 0x0000) {
 			if (value) {
-				throw new WriteValueException("We wanted to set value to true, but it stayed false.");
+				throw new WriteValueException(response, "We wanted to set value to true, but it stayed false.");
 			}
 		} else {
-			throw new ResponseException("Unexpected written value: " + writtenValue);
+			throw new ParsedResponseException(response, "Unexpected written value: " + writtenValue);
 		}
 		return null;
 	}
