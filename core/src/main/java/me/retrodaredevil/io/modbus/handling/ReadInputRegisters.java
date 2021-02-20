@@ -5,7 +5,7 @@ import me.retrodaredevil.io.modbus.parsing.MessageParseException;
 
 public class ReadInputRegisters extends BaseReadRegisters {
 	public ReadInputRegisters(int startingDataAddress, int numberOfRegisters) {
-		super(startingDataAddress, FunctionCode.READ_HOLDING_REGISTERS, numberOfRegisters);
+		super(startingDataAddress, FunctionCode.READ_INPUT_REGISTERS, numberOfRegisters);
 	}
 	public static ReadInputRegisters parseFromRequestData(int[] data) throws MessageParseException {
 		if (data.length != 4) {
