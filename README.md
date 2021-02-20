@@ -30,6 +30,7 @@ Hex  | Dec | Function
 0x01 | 1   | Read Coils
 0x02 | 2   | Read Discrete Inputs
 0x03 | 3   | Read Holding Registers
+0x04 | 4   | Read Input Registers
 0x05 | 5   | Write Single Coil
 0x06 | 6   | Write Single Register
 0x0F | 15  | Write Multiple Coils
