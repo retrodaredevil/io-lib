@@ -33,7 +33,7 @@ public class RtuDataEncoder implements IODataEncoder {
 			outputStream.write(bytes);
 			outputStream.flush(); // most serial implementations you don't have to do this, but it's good practice
 		} catch (IOException e) {
-			throw new ModbusRuntimeException("Got exception while writing", e);
+			throw new ModbusIORuntimeException("Got exception while writing", e);
 		}
 	}
 	public static byte[] toBytes(int address, ModbusMessage message){
@@ -58,7 +58,7 @@ public class RtuDataEncoder implements IODataEncoder {
 		try {
 			bytes = readBytes(inputStream);
 		} catch(IOException e){
-			throw new ModbusRuntimeException("Got exception while reading", e);
+			throw new ModbusIORuntimeException("Got exception while reading", e);
 		}
 		return fromBytes(expectedAddress, bytes);
 	}
@@ -68,8 +68,10 @@ public class RtuDataEncoder implements IODataEncoder {
 			throw new RawResponseLengthException(bytes, "Unexpected length: " + length + ". bytes: " + Arrays.toString(bytes) + ". We expected address: " + expectedAddress);
 		}
 		byte address = bytes[0];
-		if(address != expectedAddress){
-			throw new UnexpectedSlaveResponseException(expectedAddress, address);
+		// the & 0xFF probably doesn't matter, since if it's an exception, address is negative, making the result of (address != expectedAddress)
+		//   is the same when expected address is in range [0, 127], but hey, let's do it anyway
+		if((address & 0xFF) != expectedAddress){
+			throw UnexpectedSlaveResponseException.fromAddresses(bytes, expectedAddress, address & 0xFF);
 		}
 		byte code = bytes[1];
 		byte[] data = new byte[length - 4];
@@ -79,7 +81,7 @@ public class RtuDataEncoder implements IODataEncoder {
 		int expectedCrc = 0xFFFF & ((highCrc << 8) | lowCrc);
 		int actualCrc = RedundancyUtil.calculateCrc(getCrcBytes(address, code, data));
 		if(expectedCrc != actualCrc){
-			throw new RedundancyException("CRC", expectedCrc, actualCrc, "bytes: " + Arrays.toString(bytes));
+			throw RedundancyException.createFrom(bytes, "CRC", expectedCrc, actualCrc);
 		}
 
 		return ModbusMessages.createMessage(code, data);

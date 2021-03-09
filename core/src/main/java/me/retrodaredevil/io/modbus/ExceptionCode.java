@@ -1,11 +1,14 @@
 package me.retrodaredevil.io.modbus;
 
+@SuppressWarnings("unused")
 public final class ExceptionCode {
 	private ExceptionCode() { throw new UnsupportedOperationException(); }
 	// http://www.simplymodbus.ca/exceptions.htm
 
 	public static int ILLEGAL_FUNCTION = 1;
+	@Deprecated
 	public static int ILLEGAL_DATA_ACCESS = 2;
+	public static int ILLEGAL_DATA_ADDRESS = 2;
 	public static int ILLEGAL_DATA_VALUE = 3;
 	public static int SLAVE_DEVICE_FAILURE = 4;
 	public static int ACKNOWLEDGE = 5;

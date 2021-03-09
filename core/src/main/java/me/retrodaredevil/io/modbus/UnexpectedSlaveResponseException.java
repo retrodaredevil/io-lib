@@ -1,25 +1,19 @@
 package me.retrodaredevil.io.modbus;
 
-public class UnexpectedSlaveResponseException  extends ModbusRuntimeException {
-	public UnexpectedSlaveResponseException(int expectedAddress, int slaveResponseAddress){
-		this("Address: " + (expectedAddress & 0xFF) + " was expected but slave with address: " + (slaveResponseAddress & 0xFF) + " responded!");
+import me.retrodaredevil.io.modbus.handling.RawResponseException;
+
+/**
+ * Should be thrown when a different slave responds than expected
+ */
+public class UnexpectedSlaveResponseException extends RawResponseException {
+	private UnexpectedSlaveResponseException(byte[] rawData, String message) {
+		super(rawData, message);
 	}
-	public UnexpectedSlaveResponseException() {
+
+	public static UnexpectedSlaveResponseException fromAddresses(byte[] data, int expectedAddress, int slaveResponseAddress) {
+		return new UnexpectedSlaveResponseException(data, "Address: " + (expectedAddress & 0xFF) + " was expected but slave with address: " + (slaveResponseAddress & 0xFF) + " responded!");
 	}
-	
-	public UnexpectedSlaveResponseException(String message) {
-		super(message);
-	}
-	
-	public UnexpectedSlaveResponseException(String message, Throwable cause) {
-		super(message, cause);
-	}
-	
-	public UnexpectedSlaveResponseException(Throwable cause) {
-		super(cause);
-	}
-	
-	public UnexpectedSlaveResponseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
+	public static UnexpectedSlaveResponseException fromAddressesNoData(int expectedAddress, int slaveResponseAddress) {
+		return fromAddresses(null, expectedAddress, slaveResponseAddress);
 	}
 }

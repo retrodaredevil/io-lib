@@ -27,7 +27,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 			outputStream.write(bytes);
 			outputStream.flush(); // most serial implementations you don't have to do this, but it's good practice
 		} catch (IOException e) {
-			throw new ModbusRuntimeException("Got exception while writing", e);
+			throw new ModbusIORuntimeException("Got exception while writing", e);
 		}
 	}
 	public static char[] toAscii(int address, ModbusMessage message){
@@ -94,11 +94,11 @@ public class AsciiDataEncoder implements IODataEncoder {
 		}
 		int expectedLrc = fromAscii(bytes[bytes.length - 2], bytes[bytes.length - 1]);
 		if(address != expectedAddress){
-			throw new UnexpectedSlaveResponseException(expectedAddress, address);
+			throw UnexpectedSlaveResponseException.fromAddresses(bytes, expectedAddress, address);
 		}
 		int actualLrc = RedundancyUtil.calculateLrc(data);
 		if(expectedLrc != actualLrc){
-			throw new RedundancyException("LRC", expectedLrc, actualLrc, "bytes: " + Arrays.toString(bytes));
+			throw RedundancyException.createFrom(bytes, "LRC", expectedLrc, actualLrc);
 		}
 		return ModbusMessages.createMessage(functionCode, data);
 	}
@@ -124,7 +124,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 		try {
 			bytes = readLine(inputStream);
 		} catch (IOException e) {
-			throw new ModbusRuntimeException("Got exception while reading", e);
+			throw new ModbusIORuntimeException("Got exception while reading", e);
 		}
 		return fromAscii(expectedAddress, bytes);
 	}
@@ -136,7 +136,7 @@ public class AsciiDataEncoder implements IODataEncoder {
 		while(true){
 			int next = inputStream.read();
 			if(next == -1){
-				throw new ModbusRuntimeException("End of stream!");
+				throw new ModbusIORuntimeException("End of stream!");
 			}
 			if(!started){
 				started = next == ':';

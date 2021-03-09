@@ -99,6 +99,25 @@ final class ModbusTest {
 			assertEquals(expectedResponse.getFunctionCode(), response.getFunctionCode());
 			assertArrayEquals(expectedResponse.getData(), response.getData());
 		}
+		{ // test bad response
+			ByteArrayInputStream responseStream = new ByteArrayInputStream(new byte[]{
+					1,
+					3,
+					0, 0xA, // The checksum and data here are both bad
+					0, 1,
+					99, 99
+			});
+			OutputStream output = new ByteArrayOutputStream();
+			ModbusSlaveBus slave = new IOModbusSlaveBus(responseStream, output, encoder);
+
+			try {
+				slave.sendRequestMessage(1, new ReadHoldingRegisters(0x000A, 1));
+				fail("This shouldn't succeed!");
+			} catch (RedundancyException ex) {
+				assertEquals((99 << 8) | 99, ex.getExpected());
+				assertEquals(2212, ex.getActual());
+			}
+		}
 	}
 	/** A method to test encoding and decoding messages */
 	private void testDataEncoder(IODataEncoder encoder){

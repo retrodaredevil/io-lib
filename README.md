@@ -22,6 +22,7 @@ to create a serial port. Because IOBundle is a simple interface, you can easily 
 * Parse request ModbusMessages (allows you to easily respond to a master).
 * Uses common interfaces. This makes it easy to **swap out implementations**. Decide to switch from Ascii encoding to using
 TCP? No problem.
+* Custom runtime exceptions for unexpected responses and for exception codes
 
 ## Defined Modbus Function Codes
 
@@ -86,6 +87,21 @@ private static final MessageHandler<int[]> BATTERY_VOLTAGE = new ReadRegisters(0
 private final ModbusSlave slave = ...;
 public float getBatteryVoltage() {
     return slave.sendRequestMessage(BATTERY_VOLTAGE)[0] / 10.0F;
+}
+```
+Catching exceptions:
+```java
+private static final MessageHandler<int[]> SOMETIMES_SUPPORTED = new ReadHoldingRegisters(0xE02B, 1);
+private final ModbusSlave slave = ...;
+public Integer getSometimesSupportedData() {
+    try {
+        return slave.sendRequestMessage(SOMETIMES_SUPPORTED)[0];
+    } catch (ErrorCodeException ex) {
+        if (ex.getExceptionCode == ExceptionCode.ILLEGAL_DATA_ADDRESS) {
+            return null; // This address must not be supported on this device
+        }
+        throw ex;
+    }
 }
 ```
 

@@ -41,7 +41,7 @@ public class TcpModbusSlaveBus implements ModbusSlaveBus {
 		InputStream inputStream = socket.getInputStream();
 		int receivedTransactionId = get16BitDataFrom8BitArray(checkValue(inputStream.read()), checkValue(inputStream.read()))[0];
 		if (receivedTransactionId != expectedTransactionId) {
-			throw new ModbusRuntimeException("Unexpected transaction id! expected: " + expectedTransactionId + " got: " + receivedTransactionId);
+			throw new UnexpectedTransactionIdException(expectedTransactionId, receivedTransactionId);
 		}
 		checkValue(inputStream.read());
 		checkValue(inputStream.read());
@@ -51,7 +51,7 @@ public class TcpModbusSlaveBus implements ModbusSlaveBus {
 		}
 		int unitId = checkValue(inputStream.read());
 		if (unitId != address) {
-			throw new UnexpectedSlaveResponseException(address, unitId);
+			throw UnexpectedSlaveResponseException.fromAddressesNoData(address, unitId);
 		}
 		int functionCode = checkValue(inputStream.read());
 		byte[] data = new byte[length - 2];
@@ -62,7 +62,7 @@ public class TcpModbusSlaveBus implements ModbusSlaveBus {
 	}
 	private int checkValue(int value) {
 		if (value < 0) {
-			throw new ModbusRuntimeException("Got a value of " + value + "! The stream must have closed!");
+			throw new ModbusIORuntimeException("Got a value of " + value + "! The stream must have closed!");
 		}
 		return value;
 	}
@@ -73,7 +73,7 @@ public class TcpModbusSlaveBus implements ModbusSlaveBus {
 		try {
 			writeData(transactionId, address, message);
 		} catch (IOException e) {
-			throw new ModbusRuntimeException("Got exception while writing", e);
+			throw new ModbusIORuntimeException("Got exception while writing", e);
 		}
 		try {
 			return readData(transactionId, address);
