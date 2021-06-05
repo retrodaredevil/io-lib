@@ -72,16 +72,22 @@ public class AsciiDataEncoder implements IODataEncoder {
 //		return (char) (b + 65 - 10);
 		return (char) (b + 55);
 	}
+	public static ModbusMessage fromAscii(int expectedAddress, byte[] bytes){
+		AddressedModbusMessage addressedModbusMessage = fromAscii(bytes);
+		int address = addressedModbusMessage.getAddress();
+		if(address != expectedAddress){
+			throw UnexpectedSlaveResponseException.fromAddresses(bytes, expectedAddress, address);
+		}
+		return addressedModbusMessage.getModbusMessage();
+	}
 
 	/**
-	 *
-	 * @param expectedAddress The expected address in the data
 	 * @param bytes The ascii data between the ':' and '\r' Not including ':', '\r', or '\n'
 	 * @return The parsed modbus message
 	 */
-	public static ModbusMessage fromAscii(int expectedAddress, byte[] bytes){
+	public static AddressedModbusMessage fromAscii(byte[] bytes){
 		if (bytes.length < 6) {
-			throw new RawResponseLengthException(bytes, "Unexpected length: " + bytes.length + ". bytes: " + Arrays.toString(bytes) + ". We expected address: " + expectedAddress);
+			throw new RawResponseLengthException(bytes, "Unexpected length: " + bytes.length + ". bytes: " + Arrays.toString(bytes));
 		}
 		int address = fromAscii(bytes[0], bytes[1]);
 		int functionCode = fromAscii(bytes[2], bytes[3]);
@@ -93,14 +99,11 @@ public class AsciiDataEncoder implements IODataEncoder {
 			data[i] = fromAscii(high, low);
 		}
 		int expectedLrc = fromAscii(bytes[bytes.length - 2], bytes[bytes.length - 1]);
-		if(address != expectedAddress){
-			throw UnexpectedSlaveResponseException.fromAddresses(bytes, expectedAddress, address);
-		}
 		int actualLrc = RedundancyUtil.calculateLrc(data);
 		if(expectedLrc != actualLrc){
 			throw RedundancyException.createFrom(bytes, "LRC", expectedLrc, actualLrc);
 		}
-		return ModbusMessages.createMessage(functionCode, data);
+		return new AddressedModbusMessage(address, ModbusMessages.createMessage(functionCode, data));
 	}
 	private static int parseDigit(byte asciiValue) {
 		if (asciiValue > 'F') {
@@ -119,16 +122,25 @@ public class AsciiDataEncoder implements IODataEncoder {
 	}
 
 	@Override
-	public ModbusMessage readMessage(int expectedAddress, InputStream inputStream) {
-		final byte[] bytes;
+	public ModbusMessage parseMessage(int expectedAddress, byte[] bytes) {
+		return fromAscii(expectedAddress, bytes);
+	}
+
+	@Override
+	public AddressedModbusMessage parseMessage(byte[] bytes) {
+		return fromAscii(bytes);
+	}
+
+	@Override
+	public byte[] readBytes(InputStream inputStream) {
 		try {
-			bytes = readLine(inputStream);
+			return readLine(inputStream);
 		} catch (IOException e) {
 			throw new ModbusIORuntimeException("Got exception while reading", e);
 		}
-		return fromAscii(expectedAddress, bytes);
 	}
-	private byte[] readLine(InputStream inputStream) throws IOException{
+
+	private byte[] readLine(InputStream inputStream) throws IOException {
 		// TODO add optional timeout parameters to class
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 		boolean started = false;

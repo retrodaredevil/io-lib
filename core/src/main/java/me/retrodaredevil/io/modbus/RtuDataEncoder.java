@@ -28,7 +28,7 @@ public class RtuDataEncoder implements IODataEncoder {
 	}
 	@Override
 	public void sendMessage(OutputStream outputStream, int address, ModbusMessage message) {
-		byte[] bytes = toBytes(address, message);
+		byte[] bytes = getOutputOfSendMessage(address, message);
 		try {
 			outputStream.write(bytes);
 			outputStream.flush(); // most serial implementations you don't have to do this, but it's good practice
@@ -36,6 +36,12 @@ public class RtuDataEncoder implements IODataEncoder {
 			throw new ModbusIORuntimeException("Got exception while writing", e);
 		}
 	}
+
+	@Override
+	public byte[] getOutputOfSendMessage(int address, ModbusMessage message) {
+		return toBytes(address, message);
+	}
+
 	public static byte[] toBytes(int address, ModbusMessage message){
 		byte code = message.getByteFunctionCode();
 		byte[] data = message.getByteData();
@@ -53,26 +59,31 @@ public class RtuDataEncoder implements IODataEncoder {
 	}
 
 	@Override
-	public ModbusMessage readMessage(int expectedAddress, InputStream inputStream) {
-		final byte[] bytes;
-		try {
-			bytes = readBytes(inputStream);
-		} catch(IOException e){
-			throw new ModbusIORuntimeException("Got exception while reading", e);
-		}
+	public ModbusMessage parseMessage(int expectedAddress, byte[] bytes) {
 		return fromBytes(expectedAddress, bytes);
 	}
+
+	@Override
+	public AddressedModbusMessage parseMessage(byte[] bytes) {
+		return fromBytes(bytes);
+	}
+
 	public static ModbusMessage fromBytes(int expectedAddress, byte[] bytes){
-		int length = bytes.length;
-		if (length < 4) {
-			throw new RawResponseLengthException(bytes, "Unexpected length: " + length + ". bytes: " + Arrays.toString(bytes) + ". We expected address: " + expectedAddress);
-		}
-		byte address = bytes[0];
+		AddressedModbusMessage addressedModbusMessage = fromBytes(bytes);
 		// the & 0xFF probably doesn't matter, since if it's an exception, address is negative, making the result of (address != expectedAddress)
 		//   is the same when expected address is in range [0, 127], but hey, let's do it anyway
+		int address = addressedModbusMessage.getAddress();
 		if((address & 0xFF) != expectedAddress){
 			throw UnexpectedSlaveResponseException.fromAddresses(bytes, expectedAddress, address & 0xFF);
 		}
+		return addressedModbusMessage.getModbusMessage();
+	}
+	public static AddressedModbusMessage fromBytes(byte[] bytes){
+		int length = bytes.length;
+		if (length < 4) {
+			throw new RawResponseLengthException(bytes, "Unexpected length: " + length + ". bytes: " + Arrays.toString(bytes));
+		}
+		byte address = bytes[0];
 		byte code = bytes[1];
 		byte[] data = new byte[length - 4];
 		System.arraycopy(bytes, 2, data, 0, length - 4);
@@ -84,7 +95,7 @@ public class RtuDataEncoder implements IODataEncoder {
 			throw RedundancyException.createFrom(bytes, "CRC", expectedCrc, actualCrc);
 		}
 
-		return ModbusMessages.createMessage(code, data);
+		return new AddressedModbusMessage(address, ModbusMessages.createMessage(code, data));
 	}
 	private static byte[] getCrcBytes(byte address, byte functionCode, byte[] data){
 		byte[] crcBytes = new byte[data.length + 2];
@@ -93,7 +104,17 @@ public class RtuDataEncoder implements IODataEncoder {
 		System.arraycopy(data, 0, crcBytes, 2, data.length);
 		return crcBytes;
 	}
-	private byte[] readBytes(InputStream inputStream) throws IOException {
+
+	@Override
+	public byte[] readBytes(InputStream inputStream) {
+		try {
+			return doReadBytes(inputStream);
+		} catch (IOException e) {
+			throw new ModbusIORuntimeException("Got exception while reading", e);
+		}
+	}
+
+	private byte[] doReadBytes(InputStream inputStream) throws IOException {
 		byte[] buffer = new byte[1024];
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 		long startTime = System.currentTimeMillis();

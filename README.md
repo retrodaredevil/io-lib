@@ -1,5 +1,5 @@
 # io-lib
-A pure Java Modbus implementation with utilities to simplify serial communication
+A pure Java Modbus implementation with utilities to simplify serial communication. Full Java 8 required.
 
 ## Modbus Use
 This can be used to send messages to slaves (acting as a master). You can also use this to receive messages
