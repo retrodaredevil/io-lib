@@ -48,6 +48,10 @@ public class JSerialIOBundle implements IOBundle {
 		} else {
 			serialPort.clearDTR();
 		}
+		if (serialConfig.isRS485()) {
+			// note that it is necessary to call this after calling setComPortParameters
+			serialPort.setRs485ModeParameters(true, true, 10, 10);
+		}
 		inputStream = requireNonNull(serialPort.getInputStream());
 		outputStream = requireNonNull(serialPort.getOutputStream());
 	}

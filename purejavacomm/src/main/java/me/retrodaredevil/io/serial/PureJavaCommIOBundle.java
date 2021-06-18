@@ -45,8 +45,11 @@ public class PureJavaCommIOBundle implements IOBundle {
 			if (serialConfig.isDTR()) {
 				serialPort.setDTR(true);
 			}
+			if (serialConfig.isRS485()) {
+				throw new PureJavaIllegalStateException("RS485 not supported");
+			}
 		} catch (PureJavaIllegalStateException e) {
-			throw new SerialPortException("It's likely that RTS or DTR is not supported", e);
+			throw new SerialPortException("It's likely that RTS or DTR or RS485 is not supported", e);
 		}
 		try {
 			return new PureJavaCommIOBundle(serialPort);

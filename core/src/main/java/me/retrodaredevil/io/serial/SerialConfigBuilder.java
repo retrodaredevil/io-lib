@@ -3,13 +3,13 @@ package me.retrodaredevil.io.serial;
 import static java.util.Objects.requireNonNull;
 
 public class SerialConfigBuilder implements SerialConfig {
-	
+
 	private int baudRate;
 	private int dataBits = 8;
 	private StopBits stopBits = StopBits.ONE;
 	private Parity parity = Parity.NONE;
-	private boolean rts = false, dtr = false;
-	
+	private boolean rts = false, dtr = false, rs485 = false;
+
 	public SerialConfigBuilder(SerialConfig serialConfig){
 		baudRate = serialConfig.getBaudRateValue();
 		dataBits = serialConfig.getDataBitsValue();
@@ -21,9 +21,9 @@ public class SerialConfigBuilder implements SerialConfig {
 	public SerialConfigBuilder(int baudRate){
 		this.baudRate = baudRate;
 	}
-	
+
 	public SerialConfig build(){
-		return new ImmutableSerialConfig(baudRate, dataBits, stopBits, parity, rts, dtr);
+		return new ImmutableSerialConfig(baudRate, dataBits, stopBits, parity, rts, dtr, rs485);
 	}
 	@Override
 	public int getBaudRateValue() {
@@ -69,13 +69,22 @@ public class SerialConfigBuilder implements SerialConfig {
 		this.rts = b;
 		return this;
 	}
-	
+
 	@Override
 	public boolean isDTR() {
 		return dtr;
 	}
 	public SerialConfigBuilder setDTR(boolean b){
 		this.dtr = b;
+		return this;
+	}
+
+	@Override
+	public boolean isRS485() {
+		return rs485;
+	}
+	public SerialConfigBuilder setRS485(boolean isRS485) {
+		this.rs485 = isRS485;
 		return this;
 	}
 }
