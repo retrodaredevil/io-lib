@@ -6,5 +6,5 @@ version "0.0.1-SNAPSHOT"
 
 dependencies {
     api project(":core")
-    api 'com.fazecast:jSerialComm:2.8.0'
+    api 'com.fazecast:jSerialComm:2.8.2'
 }

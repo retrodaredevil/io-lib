@@ -97,7 +97,7 @@ public Integer getSometimesSupportedData() {
     try {
         return slave.sendRequestMessage(SOMETIMES_SUPPORTED)[0];
     } catch (ErrorCodeException ex) {
-        if (ex.getExceptionCode == ExceptionCode.ILLEGAL_DATA_ADDRESS) {
+        if (ex.getExceptionCode() == ExceptionCode.ILLEGAL_DATA_ADDRESS) {
             return null; // This address must not be supported on this device
         }
         throw ex;
