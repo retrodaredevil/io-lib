@@ -118,13 +118,15 @@ If you just import the `core` module, it doesn't have any dependencies. However,
 However, if you only need TCP Modbus, this library has 0 dependencies because you only need to import the `core` module.
 
 ## Using Modbus Asynchronously
-This library doesn't deal with threads at all. Everything is set up to be synchronous. However, if you want to use this
-asynchronously, you can set up your own way of executing a request asynchronously. This library won't fight you.
-Since almost everything in this library is immutable you usually don't have to worry about putting locks on
-objects because they don't have mutable state. 
+This library does not provide native support for performing a blocking action in a separate thread.
+If you would like to execute requests asynchronously, you may put that request in its own thread.
+This will work as long as you do not perform two requests at once on the same bus.
 
-If you do use this asynchronously, remember that you cannot make two requests to two different devices because they
-may come back out of order, which the library does not support.
+No Modbus library can support parallel requests for RTU/Ascii encodings,
+but some may support parallel requests for TCP.
+This library cannot be adapted for parallel requests with TCP, as that might require a big refactor of this library.
+As long as you aren't looking to do parallel requests, this library has it all!
+
 
 ## Modbus 8 Bit and 16 Bit
 Since this project deals with Modbus, there are times when code is dealing with 8 bit data or 16 bit data.
@@ -150,6 +152,7 @@ If you want to test this library, you can use https://www.modbusdriver.com/diags
   * https://github.com/Gurux/gurux.serial.java
   * https://github.com/NeuronRobotics/nrjavaserial
   * https://github.com/fy-create/JavaSerialPort
+* Support a more standardized timeout implementation for RtuDataEncoder
 
 ## References
 * http://modbus.org/docs/PI_MBUS_300.pdf
@@ -157,6 +160,8 @@ If you want to test this library, you can use https://www.modbusdriver.com/diags
 
 ## Alternatives to this library
 Don't like this library? That's cool. Here are some alternatives
+
 * https://github.com/digitalpetri/modbus
 * https://github.com/infiniteautomation/modbus4j
 * https://github.com/kochedykov/jlibmodbus
+* https://github.com/steveohara/j2mod
