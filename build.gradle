@@ -7,15 +7,16 @@ allprojects {
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        jcenter()
         google()
     }
 }
 
 subprojects {
     apply plugin: 'java-library'
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    java {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
     repositories {
         maven { url "https://repo.maven.apache.org/maven2" }
     }
@@ -30,6 +31,6 @@ subprojects {
 
 
 wrapper {
-    gradleVersion = '6.4.1'
+    gradleVersion = '9.9.1'
     distributionType = Wrapper.DistributionType.ALL
 }
