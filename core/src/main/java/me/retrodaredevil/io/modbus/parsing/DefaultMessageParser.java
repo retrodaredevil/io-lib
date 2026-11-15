@@ -3,10 +3,13 @@ package me.retrodaredevil.io.modbus.parsing;
 import me.retrodaredevil.io.modbus.FunctionCode;
 import me.retrodaredevil.io.modbus.ModbusMessage;
 import me.retrodaredevil.io.modbus.handling.*;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class DefaultMessageParser implements MessageParser {
 	@Override
-	public MessageHandler<?> parseRequestMessage(ModbusMessage message) throws MessageParseException {
+	public @Nullable MessageHandler<?> parseRequestMessage(ModbusMessage message) throws MessageParseException {
 		switch(message.getFunctionCode()) {
 			case FunctionCode.READ_COIL:
 				return ReadCoils.parseFromRequestData(message.getData());

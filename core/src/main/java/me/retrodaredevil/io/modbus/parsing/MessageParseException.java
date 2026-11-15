@@ -1,5 +1,8 @@
 package me.retrodaredevil.io.modbus.parsing;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class MessageParseException extends Exception {
 	public MessageParseException() {
 	}

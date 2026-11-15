@@ -1,7 +1,9 @@
 package me.retrodaredevil.io.modbus.handling;
 
 import me.retrodaredevil.io.modbus.ModbusMessage;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class FunctionCodeException extends ParsedResponseException {
 	private final int expectedFunctionCode;
 	public FunctionCodeException(ModbusMessage response, int expectedFunctionCode){

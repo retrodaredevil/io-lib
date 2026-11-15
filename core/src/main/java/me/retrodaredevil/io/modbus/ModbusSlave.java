@@ -1,10 +1,13 @@
 package me.retrodaredevil.io.modbus;
 
 import me.retrodaredevil.io.modbus.handling.MessageHandler;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents communication to a single ModbusSlave. The implementation can decide how to send and respond to the message
  */
+@NullMarked
 public interface ModbusSlave {
 	/**
 	 * Sends a message to the specified slave
@@ -20,7 +23,7 @@ public interface ModbusSlave {
 	 * @return The handled response
 	 * @throws ModbusRuntimeException if something went wrong while making the request or while handling the request
 	 */
-	default <T> T sendRequestMessage(MessageHandler<T> messageHandler){
+	default <T extends @Nullable Object> T sendRequestMessage(MessageHandler<T> messageHandler){
 		ModbusMessage response = sendRequestMessage(messageHandler.createRequest());
 		return messageHandler.handleResponse(response);
 	}

@@ -4,13 +4,16 @@ import me.retrodaredevil.io.modbus.FunctionCode;
 import me.retrodaredevil.io.modbus.ModbusMessage;
 import me.retrodaredevil.io.modbus.ModbusMessages;
 import me.retrodaredevil.io.modbus.parsing.MessageParseException;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Objects;
 
 import static me.retrodaredevil.io.modbus.ModbusMessages.*;
 
-public class WriteMultipleRegisters extends BaseStartingDataAddress implements MessageResponseCreator<Void> {
+@NullMarked
+public class WriteMultipleRegisters extends BaseStartingDataAddress implements MessageResponseCreator<@Nullable Void> {
 	private final int[] data8Bit;
 
 	/**
@@ -61,7 +64,7 @@ public class WriteMultipleRegisters extends BaseStartingDataAddress implements M
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		WriteMultipleRegisters that = (WriteMultipleRegisters) o;
@@ -90,7 +93,7 @@ public class WriteMultipleRegisters extends BaseStartingDataAddress implements M
 	}
 
 	@Override
-	public Void handleResponse(ModbusMessage response) {
+	public @Nullable Void handleResponse(ModbusMessage response) {
 		HandleResponseHelper.checkResponse(response, FunctionCode.WRITE_MULTIPLE_REGISTERS, 4);
 		int[] data = response.getData();
 		int setRegister = (data[0] << 8) | data[1];
@@ -106,7 +109,7 @@ public class WriteMultipleRegisters extends BaseStartingDataAddress implements M
 	}
 
 	@Override
-	public ModbusMessage createResponse(Void data) {
+	public ModbusMessage createResponse(@Nullable Void data) {
 		int numberOfRegisters = data8Bit.length / 2;
 		return ModbusMessages.createMessage(FunctionCode.WRITE_MULTIPLE_REGISTERS, get8BitDataFrom16BitArray(getStartingDataAddress(), numberOfRegisters));
 	}

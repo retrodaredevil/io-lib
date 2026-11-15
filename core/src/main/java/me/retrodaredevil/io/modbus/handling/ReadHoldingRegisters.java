@@ -2,7 +2,9 @@ package me.retrodaredevil.io.modbus.handling;
 
 import me.retrodaredevil.io.modbus.FunctionCode;
 import me.retrodaredevil.io.modbus.parsing.MessageParseException;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ReadHoldingRegisters extends BaseReadRegisters {
 	public ReadHoldingRegisters(int startingDataAddress, int numberOfRegisters) {
 		super(startingDataAddress, FunctionCode.READ_HOLDING_REGISTERS, numberOfRegisters);

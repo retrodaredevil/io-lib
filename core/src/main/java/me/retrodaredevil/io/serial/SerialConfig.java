@@ -1,5 +1,9 @@
 package me.retrodaredevil.io.serial;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public interface SerialConfig {
 	int getBaudRateValue();
 	Parity getParity();
@@ -20,7 +24,7 @@ public interface SerialConfig {
 			this.rate = rate;
 		}
 		public int getRate(){ return rate; }
-		public static Baud getBaud(int rate){
+		public static @Nullable Baud getBaud(int rate){
 			for(Baud b : values()){
 				if(b.rate == rate){
 					return b;

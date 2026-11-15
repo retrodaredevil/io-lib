@@ -1,5 +1,8 @@
 package me.retrodaredevil.io.modbus;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class InvalidResponseException extends ModbusRuntimeException {
 	public InvalidResponseException() {
 	}

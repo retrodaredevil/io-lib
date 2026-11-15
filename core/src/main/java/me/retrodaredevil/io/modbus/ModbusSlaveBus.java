@@ -1,11 +1,14 @@
 package me.retrodaredevil.io.modbus;
 
 import me.retrodaredevil.io.modbus.handling.MessageHandler;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents a class to interface with Modbus devices. When using this object, you are the Master and you are communicating
  * with slaves that will respond to messages you send through this interface
  */
+@NullMarked
 public interface ModbusSlaveBus {
 	/**
 	 * Sends a message to the specified slave
@@ -15,7 +18,7 @@ public interface ModbusSlaveBus {
 	 */
 	ModbusMessage sendRequestMessage(int address, ModbusMessage message);
 	
-	default <T> T sendRequestMessage(int address, MessageHandler<T> messageHandler){
+	default <T extends @Nullable Object> T sendRequestMessage(int address, MessageHandler<T> messageHandler){
 		ModbusMessage response = sendRequestMessage(address, messageHandler.createRequest());
 		return messageHandler.handleResponse(response);
 	}

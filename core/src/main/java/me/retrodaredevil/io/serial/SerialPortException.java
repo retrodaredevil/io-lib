@@ -1,7 +1,10 @@
 package me.retrodaredevil.io.serial;
 
+import org.jspecify.annotations.NullMarked;
+
 import java.io.IOException;
 
+@NullMarked
 public class SerialPortException extends IOException {
 	public SerialPortException() {
 	}

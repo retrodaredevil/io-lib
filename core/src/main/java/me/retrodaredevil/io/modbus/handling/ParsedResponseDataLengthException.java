@@ -1,7 +1,9 @@
 package me.retrodaredevil.io.modbus.handling;
 
 import me.retrodaredevil.io.modbus.ModbusMessage;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ParsedResponseDataLengthException extends ParsedResponseException {
 	private final int expectedDataLength;
 	public ParsedResponseDataLengthException(ModbusMessage response, int expectedDataLength) {

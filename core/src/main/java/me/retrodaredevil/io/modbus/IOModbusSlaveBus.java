@@ -1,10 +1,12 @@
 package me.retrodaredevil.io.modbus;
 
 import me.retrodaredevil.io.IOBundle;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
+@NullMarked
 public class IOModbusSlaveBus implements ModbusSlaveBus {
 	private final InputStream inputStream;
 	private final OutputStream outputStream;

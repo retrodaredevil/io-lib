@@ -1,5 +1,8 @@
 package me.retrodaredevil.io.modbus;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ModbusTimeoutException extends ModbusRuntimeException {
 	public ModbusTimeoutException() {
 	}

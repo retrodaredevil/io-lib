@@ -1,6 +1,7 @@
 package me.retrodaredevil.io.modbus;
 
 import me.retrodaredevil.io.modbus.handling.RawResponseLengthException;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
+@NullMarked
 public class AsciiDataEncoder implements IODataEncoder {
 	/*
 	 * Note that since this is ascii, each byte only ever uses 7 bits, so we (sometimes) don't have to worry about negative numbers here

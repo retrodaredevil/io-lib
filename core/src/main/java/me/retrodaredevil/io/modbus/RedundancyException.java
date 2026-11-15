@@ -1,19 +1,22 @@
 package me.retrodaredevil.io.modbus;
 
 import me.retrodaredevil.io.modbus.handling.RawResponseException;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Arrays;
 
+@NullMarked
 public class RedundancyException extends RawResponseException {
 	private final int expected;
 	private final int actual;
-	private RedundancyException(byte[] rawData, String message, int expected, int actual) {
+	private RedundancyException(byte @Nullable [] rawData, String message, int expected, int actual) {
 		super(rawData, message);
 		this.expected = expected;
 		this.actual = actual;
 	}
 
-	public static RedundancyException createFrom(byte[] bytes, String redundancyType, int expected, int actual) {
+	public static RedundancyException createFrom(byte @Nullable [] bytes, String redundancyType, int expected, int actual) {
 		String extra = bytes == null ? "" : (" bytes: " + Arrays.toString(bytes));
 		return new RedundancyException(bytes, "Incorrect " + redundancyType + " checksum. Expected: " + expected + " but got: " + actual + extra, expected, actual);
 	}

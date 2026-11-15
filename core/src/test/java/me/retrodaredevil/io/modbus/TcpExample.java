@@ -1,13 +1,16 @@
 package me.retrodaredevil.io.modbus;
 
 import me.retrodaredevil.io.modbus.handling.*;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Random;
 
+@NullMarked
 public class TcpExample {
+	private TcpExample() {}
 	public static void main(String[] args) throws IOException {
 		Random random = new Random();
 		try (Socket socket = new Socket("localhost", 502)) {

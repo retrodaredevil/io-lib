@@ -1,5 +1,8 @@
 package me.retrodaredevil.io.modbus;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ImmutableAddressModbusSlave implements ModbusSlave {
 	private final int address;
 	private final ModbusSlaveBus modbus;

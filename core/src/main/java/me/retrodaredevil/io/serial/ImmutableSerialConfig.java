@@ -1,5 +1,8 @@
 package me.retrodaredevil.io.serial;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public final class ImmutableSerialConfig implements SerialConfig {
 
 	private final int baudRate;

@@ -3,12 +3,14 @@ package me.retrodaredevil.io.serial;
 import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortInvalidPortException;
 import me.retrodaredevil.io.IOBundle;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import static java.util.Objects.requireNonNull;
 
+@NullMarked
 public class JSerialIOBundle implements IOBundle {
 	private final InputStream inputStream;
 	private final OutputStream outputStream;

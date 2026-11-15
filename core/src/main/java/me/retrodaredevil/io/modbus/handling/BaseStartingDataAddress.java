@@ -1,5 +1,8 @@
 package me.retrodaredevil.io.modbus.handling;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public abstract class BaseStartingDataAddress {
 	private final int startingDataAddress;
 

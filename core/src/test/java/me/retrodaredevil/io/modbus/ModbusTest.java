@@ -4,6 +4,8 @@ import me.retrodaredevil.io.modbus.handling.*;
 import me.retrodaredevil.io.modbus.parsing.DefaultMessageParser;
 import me.retrodaredevil.io.modbus.parsing.MessageParseException;
 import me.retrodaredevil.io.modbus.parsing.MessageParser;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -13,6 +15,7 @@ import java.io.OutputStream;
 import static me.retrodaredevil.io.modbus.ModbusMessages.get16BitDataFrom8BitArray;
 import static org.junit.jupiter.api.Assertions.*;
 
+@NullMarked
 final class ModbusTest {
 	@Test
 	void testModbusMessages(){
@@ -137,7 +140,7 @@ final class ModbusTest {
 		assertNull(getResponseData(new WriteSingleRegister(0xEA0, 0xFFFF), null));
 		assertNull(getResponseData(new WriteMultipleRegisters(0xEA0, new int[] { 127, 127, 0, 43}), null));
 	}
-	private <T> T getResponseData(MessageResponseCreator<T> messageResponseCreator, T data) {
+	private <T extends @Nullable Object> T getResponseData(MessageResponseCreator<T> messageResponseCreator, T data) {
 		ModbusMessage requestMessage = messageResponseCreator.createRequest();
 		ModbusMessage exampleResponse = messageResponseCreator.createResponse(data);
 		assertEquals(requestMessage.getFunctionCode(), exampleResponse.getFunctionCode());

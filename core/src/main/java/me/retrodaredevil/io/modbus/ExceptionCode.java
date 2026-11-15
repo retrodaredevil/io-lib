@@ -1,6 +1,9 @@
 package me.retrodaredevil.io.modbus;
 
+import org.jspecify.annotations.NullMarked;
+
 @SuppressWarnings("unused")
+@NullMarked
 public final class ExceptionCode {
 	private ExceptionCode() { throw new UnsupportedOperationException(); }
 	// http://www.simplymodbus.ca/exceptions.htm

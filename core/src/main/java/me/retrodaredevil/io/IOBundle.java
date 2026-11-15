@@ -1,5 +1,7 @@
 package me.retrodaredevil.io;
 
+import org.jspecify.annotations.NullMarked;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -11,6 +13,7 @@ import static java.util.Objects.requireNonNull;
  * It is expected that throughout the lifetime of this object that calls to both {@link #getInputStream()} and {@link #getOutputStream()}
  * will return the same instance each time it is called.
  */
+@NullMarked
 public interface IOBundle extends AutoCloseable {
 	InputStream getInputStream();
 	OutputStream getOutputStream();

@@ -1,7 +1,9 @@
 package me.retrodaredevil.io.modbus.handling;
 
 import me.retrodaredevil.io.modbus.ModbusMessage;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ErrorCodeException extends FunctionCodeException {
 	private final int exceptionCode;
 	public ErrorCodeException(ModbusMessage response, int expectedFunctionCode, int exceptionCode) {

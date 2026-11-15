@@ -4,12 +4,15 @@ import me.retrodaredevil.io.modbus.FunctionCode;
 import me.retrodaredevil.io.modbus.ModbusMessage;
 import me.retrodaredevil.io.modbus.ModbusMessages;
 import me.retrodaredevil.io.modbus.parsing.MessageParseException;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
 import static me.retrodaredevil.io.modbus.ModbusMessages.get16BitDataFrom8BitArray;
 
-public class WriteSingleRegister extends BaseSingleWrite implements MessageResponseCreator<Void> {
+@NullMarked
+public class WriteSingleRegister extends BaseSingleWrite implements MessageResponseCreator<@Nullable Void> {
 	// https://www.modbustools.com/modbus.html#function06
 
 	private final int value;
@@ -38,7 +41,7 @@ public class WriteSingleRegister extends BaseSingleWrite implements MessageRespo
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		WriteSingleRegister that = (WriteSingleRegister) o;
@@ -57,7 +60,7 @@ public class WriteSingleRegister extends BaseSingleWrite implements MessageRespo
 	}
 
 	@Override
-	public Void handleResponse(ModbusMessage response) {
+	public @Nullable Void handleResponse(ModbusMessage response) {
 		HandleResponseHelper.checkResponse(response, FunctionCode.WRITE_SINGLE_REGISTER, 4);
 		int[] data = get16BitDataFrom8BitArray(response.getData());
 		int setRegister = data[0];
@@ -70,7 +73,7 @@ public class WriteSingleRegister extends BaseSingleWrite implements MessageRespo
 	}
 
 	@Override
-	public ModbusMessage createResponse(Void data) {
+	public ModbusMessage createResponse(@Nullable Void data) {
 		return ModbusMessages.createMessage(FunctionCode.WRITE_SINGLE_REGISTER, ModbusMessages.get8BitDataFrom16BitArray(getDataAddress(), value));
 	}
 }

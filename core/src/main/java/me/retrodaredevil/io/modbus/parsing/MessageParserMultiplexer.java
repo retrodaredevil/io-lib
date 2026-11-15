@@ -2,12 +2,15 @@ package me.retrodaredevil.io.modbus.parsing;
 
 import me.retrodaredevil.io.modbus.ModbusMessage;
 import me.retrodaredevil.io.modbus.handling.MessageHandler;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+@NullMarked
 public class MessageParserMultiplexer implements MessageParser {
 	private final List<MessageParser> messageParsers;
 
@@ -16,7 +19,7 @@ public class MessageParserMultiplexer implements MessageParser {
 	}
 
 	@Override
-	public MessageHandler<?> parseRequestMessage(ModbusMessage message) throws MessageParseException {
+	public @Nullable MessageHandler<?> parseRequestMessage(ModbusMessage message) throws MessageParseException {
 		for (MessageParser messageParser : messageParsers) {
 			MessageHandler<?> messageHandler = messageParser.parseRequestMessage(message);
 			if (messageHandler != null) {

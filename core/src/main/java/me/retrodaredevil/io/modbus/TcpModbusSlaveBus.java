@@ -1,5 +1,7 @@
 package me.retrodaredevil.io.modbus;
 
+import org.jspecify.annotations.NullMarked;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -8,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static me.retrodaredevil.io.modbus.ModbusMessages.get16BitDataFrom8BitArray;
 
+@NullMarked
 public class TcpModbusSlaveBus implements ModbusSlaveBus {
 	private final AtomicInteger transactionIdCount = new AtomicInteger(0);
 	private final Socket socket;

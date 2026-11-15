@@ -1,10 +1,13 @@
 package me.retrodaredevil.io.modbus;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Represents the function code and data of a Modbus message.
  * <p>
  * This does not contain the checksum or the slave address, or MBAP header data.
  */
+@NullMarked
 public interface ModbusMessage {
 	/**
 	 * @return The function code

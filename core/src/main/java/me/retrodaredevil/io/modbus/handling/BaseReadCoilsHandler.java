@@ -2,11 +2,14 @@ package me.retrodaredevil.io.modbus.handling;
 
 import me.retrodaredevil.io.modbus.ModbusMessage;
 import me.retrodaredevil.io.modbus.ModbusMessages;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
 import static me.retrodaredevil.io.modbus.ModbusMessages.get8BitDataFrom16BitArray;
 
+@NullMarked
 public class BaseReadCoilsHandler extends BaseStartingDataAddress implements MessageResponseCreator<boolean[]> {
 	private final int functionCode;
 
@@ -22,7 +25,7 @@ public class BaseReadCoilsHandler extends BaseStartingDataAddress implements Mes
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		BaseReadCoilsHandler that = (BaseReadCoilsHandler) o;

@@ -4,13 +4,16 @@ import me.retrodaredevil.io.modbus.FunctionCode;
 import me.retrodaredevil.io.modbus.ModbusMessage;
 import me.retrodaredevil.io.modbus.ModbusMessages;
 import me.retrodaredevil.io.modbus.parsing.MessageParseException;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
 import static me.retrodaredevil.io.modbus.ModbusMessages.get16BitDataFrom8BitArray;
 import static me.retrodaredevil.io.modbus.ModbusMessages.get8BitDataFrom16BitArray;
 
-public class WriteSingleCoil extends BaseSingleWrite implements MessageResponseCreator<Void> {
+@NullMarked
+public class WriteSingleCoil extends BaseSingleWrite implements MessageResponseCreator<@Nullable Void> {
 	private final boolean value;
 
 	public WriteSingleCoil(int dataAddress, boolean value) {
@@ -38,7 +41,7 @@ public class WriteSingleCoil extends BaseSingleWrite implements MessageResponseC
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		WriteSingleCoil that = (WriteSingleCoil) o;
@@ -57,7 +60,7 @@ public class WriteSingleCoil extends BaseSingleWrite implements MessageResponseC
 	}
 
 	@Override
-	public Void handleResponse(ModbusMessage response) {
+	public @Nullable Void handleResponse(ModbusMessage response) {
 		HandleResponseHelper.checkResponse(response, FunctionCode.WRITE_SINGLE_COIL, 4);
 		int[] data8Bit = response.getData(); // we already checked that the length should be 4
 		int[] data16Bit = get16BitDataFrom8BitArray(data8Bit);
@@ -79,7 +82,7 @@ public class WriteSingleCoil extends BaseSingleWrite implements MessageResponseC
 	}
 
 	@Override
-	public ModbusMessage createResponse(Void data) {
+	public ModbusMessage createResponse(@Nullable Void data) {
 		return ModbusMessages.createMessage(FunctionCode.WRITE_SINGLE_COIL, get8BitDataFrom16BitArray(getDataAddress(), value ? 0xFF00 : 0x0000));
 	}
 }

@@ -1,7 +1,9 @@
 package me.retrodaredevil.io.modbus.handling;
 
 import me.retrodaredevil.io.modbus.ModbusMessage;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public abstract class BaseSingleWrite {
 	private final int dataAddress;
 

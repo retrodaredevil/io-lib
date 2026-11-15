@@ -2,9 +2,11 @@ package me.retrodaredevil.io.modbus.handling;
 
 import me.retrodaredevil.io.modbus.ModbusMessage;
 import me.retrodaredevil.io.modbus.ModbusMessages;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.Arrays;
 
+@NullMarked
 public final class HandleResponseHelper {
 	private HandleResponseHelper() { throw new UnsupportedOperationException(); }
 

@@ -1,9 +1,12 @@
 package me.retrodaredevil.io.modbus;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Should be thrown when an {@link java.io.IOException} needs to be rethrown, or when
  * an IO related error has occurred
  */
+@NullMarked
 public class ModbusIORuntimeException extends ModbusRuntimeException {
 	public ModbusIORuntimeException() {
 	}

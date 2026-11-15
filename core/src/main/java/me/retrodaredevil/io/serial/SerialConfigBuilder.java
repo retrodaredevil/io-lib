@@ -1,7 +1,10 @@
 package me.retrodaredevil.io.serial;
 
+import org.jspecify.annotations.NullMarked;
+
 import static java.util.Objects.requireNonNull;
 
+@NullMarked
 public class SerialConfigBuilder implements SerialConfig {
 
 	private int baudRate;

@@ -8,3 +8,8 @@ dependencies {
     api project(":core")
     api "com.github.purejavacomm:purejavacomm:1.0.2.RELEASE"
 }
+
+test {
+    // This module's test sources contain a runnable serial-port example only.
+    failOnNoDiscoveredTests = false
+}

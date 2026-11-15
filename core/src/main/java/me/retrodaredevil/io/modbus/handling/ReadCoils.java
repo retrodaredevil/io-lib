@@ -2,9 +2,11 @@ package me.retrodaredevil.io.modbus.handling;
 
 import me.retrodaredevil.io.modbus.FunctionCode;
 import me.retrodaredevil.io.modbus.parsing.MessageParseException;
+import org.jspecify.annotations.NullMarked;
 
 import static me.retrodaredevil.io.modbus.ModbusMessages.get16BitDataFrom8BitArray;
 
+@NullMarked
 public class ReadCoils extends BaseReadCoilsHandler {
 	public ReadCoils(int input, int numberOfCoils) {
 		super(FunctionCode.READ_COIL, input, numberOfCoils);

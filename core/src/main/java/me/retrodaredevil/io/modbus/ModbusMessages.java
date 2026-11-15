@@ -1,8 +1,12 @@
 package me.retrodaredevil.io.modbus;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.Objects;
 
+@NullMarked
 public final class ModbusMessages {
 	private ModbusMessages(){ throw new UnsupportedOperationException(); }
 
@@ -113,7 +117,7 @@ public final class ModbusMessages {
 		}
 		
 		@Override
-		public boolean equals(Object o) {
+		public boolean equals(@Nullable Object o) {
 			if (this == o) return true;
 			if (!(o instanceof ModbusMessage)) return false;
 			ModbusMessage that = (ModbusMessage) o;

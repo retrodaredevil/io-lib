@@ -1,8 +1,11 @@
 package me.retrodaredevil.io.modbus.handling;
 
 import me.retrodaredevil.io.modbus.ModbusMessage;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
-public interface MessageHandler<T> {
+@NullMarked
+public interface MessageHandler<T extends @Nullable Object> {
 	ModbusMessage createRequest();
 
 	/**

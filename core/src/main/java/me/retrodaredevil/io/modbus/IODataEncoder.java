@@ -1,9 +1,12 @@
 package me.retrodaredevil.io.modbus;
 
+import org.jspecify.annotations.NullMarked;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+@NullMarked
 public interface IODataEncoder {
 	void sendMessage(OutputStream outputStream, int address, ModbusMessage message);
 	default byte[] getOutputOfSendMessage(int address, ModbusMessage message) {

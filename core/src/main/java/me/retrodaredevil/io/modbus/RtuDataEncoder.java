@@ -1,6 +1,7 @@
 package me.retrodaredevil.io.modbus;
 
 import me.retrodaredevil.io.modbus.handling.RawResponseLengthException;
+import org.jspecify.annotations.NullMarked;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 
+@NullMarked
 public class RtuDataEncoder implements IODataEncoder {
 	private final long initialTimeout;
 	private final long endMillis;

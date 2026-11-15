@@ -1,12 +1,14 @@
 package me.retrodaredevil.io.serial;
 
 import me.retrodaredevil.io.IOBundle;
+import org.jspecify.annotations.NullMarked;
 import purejavacomm.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+@NullMarked
 public class PureJavaCommIOBundle implements IOBundle {
 	private final SerialPort serialPort;
 	private final InputStream inputStream;

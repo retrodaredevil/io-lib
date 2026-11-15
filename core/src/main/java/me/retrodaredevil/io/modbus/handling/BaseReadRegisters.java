@@ -2,12 +2,15 @@ package me.retrodaredevil.io.modbus.handling;
 
 import me.retrodaredevil.io.modbus.ModbusMessage;
 import me.retrodaredevil.io.modbus.ModbusMessages;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
 
 import static me.retrodaredevil.io.modbus.ModbusMessages.get16BitDataFrom8BitArray;
 import static me.retrodaredevil.io.modbus.ModbusMessages.get8BitDataFrom16BitArray;
 
+@NullMarked
 public class BaseReadRegisters extends BaseStartingDataAddress implements MessageResponseCreator<int[]> {
 	private final int functionCode;
 	private final int numberOfRegisters;
@@ -28,7 +31,7 @@ public class BaseReadRegisters extends BaseStartingDataAddress implements Messag
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		BaseReadRegisters that = (BaseReadRegisters) o;
