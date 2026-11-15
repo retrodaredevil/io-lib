@@ -6,5 +6,6 @@ version "0.0.1-SNAPSHOT"
 
 dependencies {
     api project(":core")
-    api 'com.fazecast:jSerialComm:2.8.2'
+    // https://github.com/Fazecast/jSerialComm/releases
+    api 'com.fazecast:jSerialComm:2.11.4'
 }
